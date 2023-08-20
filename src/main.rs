@@ -1,8 +1,9 @@
 use std::fs;
 
+use crate::lexical_analysis::lex;
+
 pub mod error;
-pub mod lex;
-pub mod token_map;
+pub mod lexical_analysis;
 
 fn main() {
     tracing_subscriber::fmt().pretty().init();

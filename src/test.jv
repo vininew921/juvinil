@@ -1,11 +1,22 @@
-init a
-init b
-init c
+int a;
 
-test = "asuidgaisudgxddddd"
+string test = "random_string";
 
-a = 5
-b = 3
-c = "12"
+float c;
+boolean d = true;
+char e;
+void f;
+return 5;
+if a;
+int test_case = 5;
+else;
+for i;
+while j;
+switch k;
+case t;
 
-result = a + b
+a = 5;
+b = 3;
+c = "12";
+
+int result = a + b;

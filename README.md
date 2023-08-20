@@ -1,15 +1,9 @@
 # JUVINIL programming language
 
-### Symbol Equivalence Table
+### Keywords
 
 | Source | Target|
 |--|--|
-| int | i32 |
-| string | str |
-| float | f32 |
-| boolean | bool |
-| char | char |
-| void | () |
 | func | fn |
 | return | return |
 | if | if |
@@ -18,6 +12,19 @@
 | while | while |
 | switch | match |
 | case | match case |
+| true | true |
+| false | false |
+
+### Types
+| Source | Target|
+|--|--|
+| int | i32 |
+| string | str |
+| float | f32 |
+| boolean | bool |
+| char | char |
+| void | () |
+
 
 ### Operators
 | Op | Description |
