@@ -7,7 +7,7 @@ use crate::{
 
 use super::{jv_types, keyword, operators, regex_token};
 
-pub fn process_file_content(content: String) -> JuvinilResult<()> {
+pub fn tokenize(content: String) -> JuvinilResult<Vec<Vec<Token>>> {
     tracing::info!("File content: \n{}", content);
 
     let mut tokens: Vec<Vec<Token>> = Vec::new();
@@ -28,7 +28,7 @@ pub fn process_file_content(content: String) -> JuvinilResult<()> {
         tracing::info!("{} - {:?}", line_number + 1, token_line);
     }
 
-    Ok(())
+    Ok(tokens)
 }
 
 fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {

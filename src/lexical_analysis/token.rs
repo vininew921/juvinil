@@ -53,10 +53,6 @@ impl Token {
             _ => panic!("This shouldn't be possible xdd"),
         }
     }
-
-    pub fn to_string(&self) -> String {
-        format!("<{:?} {}>", self.token_type, self.value)
-    }
 }
 
 impl std::fmt::Debug for Token {

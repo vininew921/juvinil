@@ -1,5 +1,7 @@
 use std::fs;
 
+use error::JuvinilResult;
+
 use crate::lexical_analysis::lex;
 
 pub mod error;
@@ -8,18 +10,18 @@ pub mod lexical_analysis;
 fn main() {
     tracing_subscriber::fmt().pretty().init();
 
-    let file_path = "src/test.jv";
-    let file_result = fs::read_to_string(file_path);
-
-    if let Ok(file) = file_result {
-        if let Err(err) = lex::process_file_content(file) {
-            tracing::error!("Error processing file contents: {}", err);
-            return;
-        }
-
-        tracing::info!("Success!");
-        return;
+    if let Err(err) = run("src/test.jv") {
+        tracing::error!("{}", err);
+        std::process::exit(1);
     }
+}
 
-    tracing::error!("Error opening file {file_path}");
+fn run(file_path: &str) -> JuvinilResult<()> {
+    let file = fs::read_to_string(file_path)?;
+    tracing::info!("Successfully read contents of file {}", file_path);
+
+    let _tokens = lex::tokenize(file)?;
+    tracing::info!("Successfully tokenized file contents");
+
+    Ok(())
 }
