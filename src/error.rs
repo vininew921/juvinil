@@ -1,7 +1,7 @@
 #[derive(Debug, thiserror::Error)]
 pub enum JuvinilError {
     #[error("Couldn't match token {0} to any defined expression - line {1}")]
-    NoRegexMatch(String, usize),
+    SyntaxError(String, usize),
     #[error(transparent)]
     IoError(#[from] std::io::Error),
 }

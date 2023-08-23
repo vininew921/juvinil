@@ -7,10 +7,8 @@ use crate::{
 
 use super::{jv_types, keyword, operators, regex_token};
 
-pub fn tokenize(content: String) -> JuvinilResult<Vec<Vec<Token>>> {
-    tracing::info!("File content: \n{}", content);
-
-    let mut tokens: Vec<Vec<Token>> = Vec::new();
+pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
+    let mut tokens: Vec<Token> = Vec::new();
 
     for (line_number, line_content) in content.lines().enumerate().into_iter() {
         if line_content.trim().is_empty() {
@@ -19,13 +17,21 @@ pub fn tokenize(content: String) -> JuvinilResult<Vec<Vec<Token>>> {
 
         let mut token_line: Vec<Token> = Vec::new();
 
-        for token in line_content.split(" ") {
-            let stripped_token = token.replace(";", "");
-            token_line.push(process_token(stripped_token.as_str(), line_number + 1)?);
+        for lookahead in line_content.trim().split(" ") {
+            if lookahead.chars().last().unwrap() == ';' {
+                token_line.push(process_token(
+                    lookahead.split(";").next().unwrap(),
+                    line_number + 1,
+                )?);
+
+                token_line.push(process_token(";", line_number + 1)?);
+            } else {
+                token_line.push(process_token(lookahead, line_number + 1)?);
+            }
         }
 
-        tokens.push(token_line.clone());
-        tracing::info!("{} - {:?}", line_number + 1, token_line);
+        tracing::info!("{} | {:?}", line_number + 1, token_line);
+        tokens.extend(token_line);
     }
 
     Ok(tokens)
@@ -47,7 +53,7 @@ fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {
     let regex_token = regex_token::REGEX_TOKEN_MAP
         .iter()
         .find(|op| Regex::new(op.regex_template).unwrap().is_match(token))
-        .ok_or(JuvinilError::NoRegexMatch(String::from(token), line_number))?;
+        .ok_or(JuvinilError::SyntaxError(String::from(token), line_number))?;
 
     Ok(Token::from_regex_token(regex_token, token))
 }

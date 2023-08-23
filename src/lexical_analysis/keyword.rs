@@ -12,6 +12,7 @@ pub enum Keyword {
     CASE,
     TRUE,
     FALSE,
+    ENDEXPR,
 }
 
 pub static KEYWORDS: phf::Map<&'static str, Keyword> = phf_map! {
@@ -25,4 +26,5 @@ pub static KEYWORDS: phf::Map<&'static str, Keyword> = phf_map! {
     "case" => Keyword::CASE,
     "true" => Keyword::TRUE,
     "false" => Keyword::FALSE,
+    ";" => Keyword::ENDEXPR,
 };
