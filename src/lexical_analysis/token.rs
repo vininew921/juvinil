@@ -1,10 +1,15 @@
-use super::{jv_types::JvType, keyword::Keyword, operators::Operator, regex_token::RegexToken};
+use super::{
+    comparators::Comparator, jv_types::JvType, keyword::Keyword, operators::Operator,
+    regex_token::RegexToken, symbols::Symbol,
+};
 
 #[derive(Debug, Clone)]
 pub enum TokenType {
     KEYWORD,
     OPERATOR,
     TYPE,
+    SYMBOL,
+    COMPARATOR,
     ID,
     STRING,
     NUMBER,
@@ -31,6 +36,14 @@ impl Token {
 
     pub fn from_type(value: &JvType) -> Self {
         Token::new(TokenType::TYPE, format!("{:?}", value))
+    }
+
+    pub fn from_symbol(value: &Symbol) -> Self {
+        Token::new(TokenType::SYMBOL, format!("{:?}", value))
+    }
+
+    pub fn from_comparator(value: &Comparator) -> Self {
+        Token::new(TokenType::COMPARATOR, format!("{:?}", value))
     }
 
     pub fn from_id(value: &str) -> Self {

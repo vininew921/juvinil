@@ -8,11 +8,12 @@ pub enum Keyword {
     ELSE,
     FOR,
     WHILE,
+    BREAK,
+    CONTINUE,
     SWITCH,
     CASE,
     TRUE,
     FALSE,
-    ENDEXPR,
 }
 
 pub static KEYWORDS: phf::Map<&'static str, Keyword> = phf_map! {
@@ -22,9 +23,10 @@ pub static KEYWORDS: phf::Map<&'static str, Keyword> = phf_map! {
     "else" => Keyword::ELSE,
     "for" => Keyword::FOR,
     "while" => Keyword::WHILE,
+    "break" => Keyword::BREAK,
+    "continue" => Keyword::CONTINUE,
     "switch" => Keyword::SWITCH,
     "case" => Keyword::CASE,
     "true" => Keyword::TRUE,
     "false" => Keyword::FALSE,
-    ";" => Keyword::ENDEXPR,
 };

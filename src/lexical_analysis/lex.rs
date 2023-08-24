@@ -5,7 +5,7 @@ use crate::{
     lexical_analysis::token::Token,
 };
 
-use super::{jv_types, keyword, operators, regex_token};
+use super::{comparators, jv_types, keyword, operators, regex_token, symbols};
 
 pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
     let mut tokens: Vec<Token> = Vec::new();
@@ -18,6 +18,11 @@ pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
         let mut token_line: Vec<Token> = Vec::new();
 
         for lookahead in line_content.trim().split(" ") {
+            if lookahead.contains(r#"""#) {
+                token_line.push(process_token(lookahead, line_number + 1)?);
+                continue;
+            }
+
             if lookahead.chars().last().unwrap() == ';' {
                 token_line.push(process_token(
                     lookahead.split(";").next().unwrap(),
@@ -25,9 +30,19 @@ pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
                 )?);
 
                 token_line.push(process_token(";", line_number + 1)?);
-            } else {
-                token_line.push(process_token(lookahead, line_number + 1)?);
+                continue;
             }
+
+            if lookahead.chars().next().unwrap() == '!' {
+                token_line.push(process_token("!", line_number + 1)?);
+                token_line.push(process_token(
+                    lookahead.split("!").last().unwrap(),
+                    line_number + 1,
+                )?);
+                continue;
+            }
+
+            token_line.push(process_token(lookahead, line_number + 1)?);
         }
 
         tracing::info!("{} | {:?}", line_number + 1, token_line);
@@ -48,6 +63,14 @@ fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {
 
     if let Some(jv_type) = jv_types::JV_TYPES.get(token) {
         return Ok(Token::from_type(jv_type));
+    }
+
+    if let Some(symbol) = symbols::SYMBOLS.get(token) {
+        return Ok(Token::from_symbol(symbol));
+    }
+
+    if let Some(comparator) = comparators::COMPARATORS.get(token) {
+        return Ok(Token::from_comparator(comparator));
     }
 
     let regex_token = regex_token::REGEX_TOKEN_MAP
