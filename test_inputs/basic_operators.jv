@@ -1,0 +1,13 @@
+float a;
+float b;
+float c;
+
+a = 4;
+b = a;
+
+c = a + b;
+c = a - b;
+c = a / b;
+c = a * b;
+
+c = c + 1;
