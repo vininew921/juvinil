@@ -11,6 +11,10 @@ pub enum Operator {
     NOT,
     BINARYAND,
     BINARYOR,
+    INCREMENT,
+    DECREMENT,
+    INCREMENTBY,
+    DECREMENTBY,
 }
 
 pub static OPERATORS: phf::Map<&'static str, Operator> = phf_map! {
@@ -23,4 +27,8 @@ pub static OPERATORS: phf::Map<&'static str, Operator> = phf_map! {
     "!" => Operator::NOT,
     "&" => Operator::BINARYAND,
     "|" => Operator::BINARYOR,
+    "++" => Operator::INCREMENT,
+    "--" => Operator::DECREMENT,
+    "+=" => Operator::INCREMENTBY,
+    "-=" => Operator::DECREMENTBY,
 };

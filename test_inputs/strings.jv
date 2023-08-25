@@ -1,0 +1,5 @@
+string a = "word";
+string b = "with spaces";
+string c = "no endexpr ';'"
+string d = "multiple words i don't know";
+
