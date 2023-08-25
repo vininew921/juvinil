@@ -10,6 +10,8 @@
 | else | else |
 | for | for |
 | while | while |
+| break | break |
+| continue | continue |
 | switch | match |
 | case | match case |
 | true | true |
@@ -18,30 +20,49 @@
 ### Types
 | Source | Target|
 |--|--|
+| void | () |
 | int | i32 |
-| string | str |
 | float | f32 |
 | boolean | bool |
 | char | char |
-| void | () |
-
+| string | str |
 
 ### Operators
-| Op | Description |
+| Source | Description |
 |--|--|
-| + | Addition |
-| - | Subtraction |
-| * | Multiplication |
-| / | Division |
+| = | Assign |
+| + | Add |
+| - | Subtract |
+| * | Multiply |
+| / | Divide |
 | % | Module |
-| ! | Boolean NOT |
-| & | Boolean AND |
-| \|| Boolean OR |
+| ! | NOT |
+| & | Binary AND |
+| \|| Binary OR |
+| ++ | Increment |
+| -- | Decrement |
+| += | Increment By |
+| -= | Decrement By |
+
+### Comparators
+| Source | Description |
+|--|--|
+| && | AND |
+| \|\|| OR |
+| == | Equal |
+| != | Not Equal | 
 | > | Bigger than |
 | < | Smaller than |
 | >= | Equal or bigger than |
 | <= | Equal or smaller than |
-| == | Equal |
-| != | Different | 
-| && | AND |
-| \|\|| OR |
+
+### Symbols
+| Source | Description |
+|--|--|
+| ; | End expression |
+| ( | Opened Parenthesis |
+| ) | Closed Parenthesis |
+| [ | Opened Brackets |
+| ] | Closed Brackets |
+| { | Opened Curly Brackets |
+| } | Closed Curly Brackets |
