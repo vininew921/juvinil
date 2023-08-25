@@ -15,7 +15,7 @@ impl RegexToken {
 }
 
 pub const REGEX_TOKEN_MAP: [RegexToken; 3] = [
-    RegexToken::new(r#"^\d+$"#, TokenType::NUMBER),
+    RegexToken::new(r#"^[+-]?([0-9]*[.])?[0-9]+$"#, TokenType::NUMBER),
     RegexToken::new(r#"^"[^"]*"$"#, TokenType::STRING),
     RegexToken::new(r#"^[a-zA-Z_]+$"#, TokenType::ID),
 ];

@@ -9,6 +9,7 @@ use super::{comparators, jv_types, keyword, operators, regex_token, symbols};
 
 pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
     let mut tokens: Vec<Token> = Vec::new();
+    let special_symbols = "!;{}()[]";
 
     for (line_number, line_content) in content.lines().enumerate().into_iter() {
         if line_content.trim().is_empty() {
@@ -16,33 +17,52 @@ pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
         }
 
         let mut token_line: Vec<Token> = Vec::new();
+        let mut processed_content: Vec<String> = Vec::new();
+        let mut inside_string = false;
+        let mut complete_string = String::new();
 
-        for lookahead in line_content.trim().split(" ") {
-            if lookahead.contains(r#"""#) {
-                token_line.push(process_token(lookahead, line_number + 1)?);
-                continue;
+        for word in line_content.trim().split(" ") {
+            if word.chars().next().unwrap() == '\"' {
+                inside_string = true;
             }
 
-            if lookahead.chars().last().unwrap() == ';' {
-                token_line.push(process_token(
-                    lookahead.split(";").next().unwrap(),
-                    line_number + 1,
-                )?);
+            if inside_string {
+                complete_string.push_str(word);
 
-                token_line.push(process_token(";", line_number + 1)?);
-                continue;
+                if word.contains('\"') {
+                    let splitted_word = word.split("\"");
+                    inside_string = false;
+
+                    for sw in splitted_word {
+                        processed_content.push(sw.into());
+                    }
+
+                    continue;
+                }
             }
 
-            if lookahead.chars().next().unwrap() == '!' {
-                token_line.push(process_token("!", line_number + 1)?);
-                token_line.push(process_token(
-                    lookahead.split("!").last().unwrap(),
-                    line_number + 1,
-                )?);
-                continue;
+            for sc in special_symbols.chars() {
+                if word.contains(sc) {
+                    for splitted_word in word.split(sc) {
+                        if splitted_word.is_empty() {
+                            processed_content.push(String::from(sc));
+                            continue;
+                        }
+
+                        processed_content.push(splitted_word.into());
+                    }
+                }
             }
 
-            token_line.push(process_token(lookahead, line_number + 1)?);
+            processed_content.push(word.into());
+        }
+
+        if inside_string {
+            return Err(JuvinilError::UnclosedString(line_number));
+        }
+
+        for lookahead in processed_content {
+            token_line.push(process_token(lookahead.as_str(), line_number + 1)?);
         }
 
         tracing::info!("{} | {:?}", line_number + 1, token_line);
