@@ -1,27 +1,29 @@
 use std::fs;
 
-use error::JuvinilResult;
-
-use crate::lexical_analysis::lex;
-
-pub mod error;
-pub mod lexical_analysis;
+use juvinil::{error::JuvinilResult, lexical_analysis::lex, syntax_analysis::parser::Parser};
 
 fn main() {
     tracing_subscriber::fmt().pretty().init();
 
-    if let Err(err) = run("test_inputs/for.jv") {
+    if let Err(err) = run("test_inputs/test.jv") {
         tracing::error!("{}", err);
         std::process::exit(1);
     }
 }
 
 fn run(file_path: &str) -> JuvinilResult<()> {
+    tracing::info!("--------READING INPUT--------");
     let file = fs::read_to_string(file_path)?;
     tracing::info!("Successfully read contents of file {}", file_path);
 
-    let _tokens = lex::tokenize(file)?;
+    tracing::info!("--------LEXICAL ANALYSIS--------");
+    let tokens = lex::tokenize(file)?;
     tracing::info!("Successfully tokenized file contents");
+
+    tracing::info!("--------SYNTAX ANALYSIS--------");
+    let mut parser = Parser::new(tokens);
+    parser.parse()?;
+    tracing::info!("Successfully parsed tokens");
 
     Ok(())
 }

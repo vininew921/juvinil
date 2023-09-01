@@ -3,7 +3,7 @@ use super::{
     regex_token::RegexToken, symbols::Symbol,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     KEYWORD,
     OPERATOR,
@@ -13,6 +13,7 @@ pub enum TokenType {
     ID,
     STRING,
     NUMBER,
+    EOF,
 }
 
 #[derive(Clone)]
@@ -65,6 +66,10 @@ impl Token {
             TokenType::NUMBER => Token::from_number(value),
             _ => panic!("This shouldn't be possible xdd"),
         }
+    }
+
+    pub fn eof() -> Self {
+        Token::new(TokenType::EOF, "".into())
     }
 }
 

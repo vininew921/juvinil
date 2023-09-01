@@ -17,6 +17,12 @@ pub enum Operator {
     DECREMENTBY,
 }
 
+impl ToString for Operator {
+    fn to_string(&self) -> String {
+        format!("{:?}", self)
+    }
+}
+
 pub static OPERATORS: phf::Map<&'static str, Operator> = phf_map! {
     "=" => Operator::ASSIGN,
     "+" => Operator::ADD,

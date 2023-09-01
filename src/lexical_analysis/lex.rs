@@ -27,6 +27,8 @@ pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
         tokens.extend(token_line);
     }
 
+    tokens.push(Token::eof());
+
     Ok(tokens)
 }
 
@@ -131,7 +133,7 @@ fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {
     let regex_token = regex_token::REGEX_TOKEN_MAP
         .iter()
         .find(|op| Regex::new(op.regex_template).unwrap().is_match(token))
-        .ok_or(JuvinilError::SyntaxError(String::from(token), line_number))?;
+        .ok_or(JuvinilError::LexicalError(String::from(token), line_number))?;
 
     Ok(Token::from_regex_token(regex_token, token))
 }

@@ -1,7 +1,11 @@
 #[derive(Debug, thiserror::Error)]
 pub enum JuvinilError {
     #[error("Couldn't match token {0} to any defined expression - line {1}")]
-    SyntaxError(String, usize),
+    LexicalError(String, usize),
+    #[error("Syntax error")]
+    SyntaxError,
+    #[error("Parsing error")]
+    ParsingError,
     #[error("Unclosed string - line {0}")]
     UnclosedString(usize),
     #[error(transparent)]

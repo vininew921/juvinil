@@ -11,6 +11,12 @@ pub enum Symbol {
     SBCLOSE,
 }
 
+impl ToString for Symbol {
+    fn to_string(&self) -> String {
+        format!("{:?}", self)
+    }
+}
+
 pub static SYMBOLS: phf::Map<&'static str, Symbol> = phf_map! {
     ";" => Symbol::ENDEXPR,
     "(" => Symbol::POPEN,
