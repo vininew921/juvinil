@@ -19,8 +19,8 @@ pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
 
         let mut token_line: Vec<Token> = Vec::new();
 
-        for lookahead in pre_processed_line {
-            token_line.push(process_token(lookahead.as_str(), line_number + 1)?);
+        for str_token in pre_processed_line {
+            token_line.push(process_token(str_token.as_str(), line_number + 1)?);
         }
 
         tracing::info!("{} | {:?}", line_number + 1, token_line);
@@ -33,10 +33,6 @@ pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
 }
 
 fn pre_process_line(line_content: &str, line_number: usize) -> JuvinilResult<Vec<String>> {
-    let special_symbols = vec![
-        "!", ";", "++", "--", "+=", "-=", "{", "}", "(", ")", "[", "]",
-    ];
-
     if line_content.chars().filter(|c| c == &'\"').count() % 2 != 0 {
         return Err(JuvinilError::UnclosedString(line_number + 1));
     }
@@ -45,60 +41,48 @@ fn pre_process_line(line_content: &str, line_number: usize) -> JuvinilResult<Vec
     let mut inside_string = false;
     let mut complete_string = String::new();
 
-    for word in line_content.trim().split(" ") {
-        let mut has_special_character = false;
-
-        if word.chars().next().unwrap() == '\"' {
+    for word in line_content.trim().split_whitespace() {
+        if word.starts_with('\"') {
             inside_string = true;
         }
 
-        //If inside a string, we append the `complete_string` variable until we find another <">
+        //If inside a string, we append the `complete_string` variable until we find a <";>
         if inside_string {
-            for spw in word.split_inclusive("\"") {
-                if spw.chars().last().unwrap() == '\"' {
-                    if complete_string.is_empty() {
-                        complete_string.push_str(spw);
-                        continue;
-                    }
-
-                    inside_string = false;
-                    complete_string.push_str(spw);
-                    processed_content.push(complete_string.clone());
-                    complete_string.clear();
-                    continue;
-                }
-
-                if inside_string {
-                    complete_string.push_str(spw);
-                    complete_string.push_str(" ");
-                    continue;
-                }
-
-                processed_content.push(spw.into());
+            complete_string.push_str(word);
+            if word.ends_with(&['\"', ';'][..]) {
+                inside_string = false;
+                processed_content.push(complete_string[0..complete_string.len() - 1].to_string());
+                processed_content.push(";".into());
+                complete_string.clear();
+            } else {
+                complete_string.push(' ');
             }
 
             continue;
         }
 
-        //If a word contains a special character, we split it from the word to process it
-        //separately. We're already sure that the word isn't a string here
-        //To do: improve this, cases like i++) won't work, or count++;
-        for sc in special_symbols.clone() {
-            if word.trim().contains(sc) && word.trim().len() > 1 {
-                has_special_character = true;
-                for splitted_word in word.split(sc) {
-                    if splitted_word.is_empty() {
-                        processed_content.push(sc.into());
-                        continue;
-                    }
+        let special_symbols = &[
+            "!", "++", "--", "+=", "-=", "{", "}", "(", ")", "[", "]", ";",
+        ];
 
-                    processed_content.push(splitted_word.into());
+        let mut has_special_symbol = false;
+        for special_symbol in special_symbols {
+            if word.contains(special_symbol) {
+                has_special_symbol = true;
+                let mut pushed_special = false;
+                for part in word.split(special_symbol) {
+                    if !part.is_empty() {
+                        processed_content.push(part.to_string());
+                    } else if !pushed_special {
+                        processed_content.push(special_symbol.to_string());
+                        pushed_special = true;
+                    }
                 }
             }
         }
 
-        if !has_special_character {
-            processed_content.push(word.into());
+        if !has_special_symbol {
+            processed_content.push(word.to_string());
         }
     }
 
