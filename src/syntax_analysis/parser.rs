@@ -63,17 +63,49 @@ impl Parser {
         Ok(())
     }
 
-    fn program(&mut self) -> JuvinilResult<()> {
-        self.asgn()
+    fn verify_current(&mut self, token_type: TokenType, value: Option<&str>) -> bool {
+        if let Some(ct) = self.current_token.clone() {
+            if value.is_none() {
+                return ct.token_type == token_type;
+            }
+
+            return ct.token_type == token_type && ct.value.as_str() == value.unwrap();
+        }
+
+        return false;
     }
 
-    fn decl(&mut self) -> JuvinilResult<()> {
+    fn program(&mut self) -> JuvinilResult<()> {
+        if self.verify_current(TokenType::SYMBOL, Some("{")) {
+            return self.block();
+        }
+
+        if self.verify_current(TokenType::TYPE, None) {
+            return self.decls();
+        }
+
+        self.stmts()
+    }
+
+    fn block(&mut self) -> JuvinilResult<()> {
+        Ok(())
+    }
+
+    fn decls(&mut self) -> JuvinilResult<()> {
+        Ok(())
+    }
+
+    fn stmts(&mut self) -> JuvinilResult<()> {
+        Ok(())
+    }
+
+    fn _decl(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::TYPE, None)?;
         self.consume(TokenType::ID, None)
     }
 
-    fn asgn(&mut self) -> JuvinilResult<()> {
-        self.decl()?;
+    fn _asgn(&mut self) -> JuvinilResult<()> {
+        self._decl()?;
         self.consume(TokenType::OPERATOR, Some("="))
     }
 
