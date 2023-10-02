@@ -1,7 +1,19 @@
-use super::{
-    comparators::Comparator, jv_types::JvType, keyword::Keyword, operators::Operator,
-    regex_token::RegexToken, symbols::Symbol,
-};
+use super::regex_token::RegexToken;
+
+pub const KEYWORDS: [&'static str; 12] = [
+    "func", "return", "if", "else", "for", "while", "break", "continue", "switch", "case", "true",
+    "false",
+];
+
+pub const OPERATORS: [&'static str; 13] = [
+    "=", "+", "-", "*", "/", "%", "!", "&", "|", "++", "--", "+=", "-=",
+];
+
+pub const JV_TYPES: [&'static str; 6] = ["void", "int", "float", "boolean", "char", "string"];
+
+pub const SYMBOLS: [&'static str; 7] = [";", "(", ")", "[", "]", "{", "}"];
+
+pub const COMPARATORS: [&'static str; 8] = ["&&", "||", "==", "!=", "<", ">", ">=", "<="];
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
@@ -27,43 +39,43 @@ impl Token {
         Token { token_type, value }
     }
 
-    pub fn from_keyword(value: &Keyword) -> Self {
-        Token::new(TokenType::KEYWORD, format!("{:?}", value))
+    pub fn new_keyword(value: String) -> Self {
+        Token::new(TokenType::KEYWORD, value)
     }
 
-    pub fn from_operator(value: &Operator) -> Self {
-        Token::new(TokenType::OPERATOR, format!("{:?}", value))
+    pub fn new_operator(value: String) -> Self {
+        Token::new(TokenType::OPERATOR, value)
     }
 
-    pub fn from_type(value: &JvType) -> Self {
-        Token::new(TokenType::TYPE, format!("{:?}", value))
+    pub fn new_type(value: String) -> Self {
+        Token::new(TokenType::TYPE, value)
     }
 
-    pub fn from_symbol(value: &Symbol) -> Self {
-        Token::new(TokenType::SYMBOL, format!("{:?}", value))
+    pub fn new_symbol(value: String) -> Self {
+        Token::new(TokenType::SYMBOL, value)
     }
 
-    pub fn from_comparator(value: &Comparator) -> Self {
-        Token::new(TokenType::COMPARATOR, format!("{:?}", value))
+    pub fn new_comparator(value: String) -> Self {
+        Token::new(TokenType::COMPARATOR, value)
     }
 
-    pub fn from_id(value: &str) -> Self {
-        Token::new(TokenType::ID, value.into())
+    pub fn new_id(value: String) -> Self {
+        Token::new(TokenType::ID, value)
     }
 
-    pub fn from_string(value: &str) -> Self {
-        Token::new(TokenType::STRING, String::from(value).replace(r#"""#, ""))
+    pub fn new_string(value: String) -> Self {
+        Token::new(TokenType::STRING, value.replace(r#"""#, ""))
     }
 
-    pub fn from_number(value: &str) -> Self {
-        Token::new(TokenType::NUMBER, value.into())
+    pub fn new_number(value: String) -> Self {
+        Token::new(TokenType::NUMBER, value)
     }
 
     pub fn from_regex_token(rt: &RegexToken, value: &str) -> Self {
         match rt.token_type {
-            TokenType::ID => Token::from_id(value),
-            TokenType::STRING => Token::from_string(value),
-            TokenType::NUMBER => Token::from_number(value),
+            TokenType::ID => Token::new_id(value.into()),
+            TokenType::STRING => Token::new_string(value.into()),
+            TokenType::NUMBER => Token::new_number(value.into()),
             _ => panic!("This shouldn't be possible xdd"),
         }
     }

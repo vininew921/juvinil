@@ -1,10 +1,6 @@
 use crate::{
     error::{JuvinilError, JuvinilResult},
-    lexical_analysis::{
-        operators::Operator,
-        symbols::Symbol,
-        token::{Token, TokenType},
-    },
+    lexical_analysis::token::{Token, TokenType},
 };
 
 pub struct Parser {
@@ -48,7 +44,7 @@ impl Parser {
         res
     }
 
-    fn consume(&mut self, token_type: TokenType, value: Option<String>) -> JuvinilResult<()> {
+    fn consume(&mut self, token_type: TokenType, value: Option<&str>) -> JuvinilResult<()> {
         let ref_self = self
             .current_token
             .as_ref()
@@ -78,10 +74,10 @@ impl Parser {
 
     fn asgn(&mut self) -> JuvinilResult<()> {
         self.decl()?;
-        self.consume(TokenType::OPERATOR, Some(Operator::ASSIGN.to_string()))
+        self.consume(TokenType::OPERATOR, Some("="))
     }
 
     fn _endexpr(&mut self) -> JuvinilResult<()> {
-        self.consume(TokenType::SYMBOL, Some(Symbol::ENDEXPR.to_string()))
+        self.consume(TokenType::SYMBOL, Some(";"))
     }
 }

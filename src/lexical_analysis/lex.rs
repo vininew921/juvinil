@@ -5,7 +5,7 @@ use crate::{
     lexical_analysis::token::Token,
 };
 
-use super::{comparators, jv_types, keyword, operators, regex_token, symbols};
+use super::{regex_token, token};
 
 pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
     let mut tokens: Vec<Token> = Vec::new();
@@ -94,24 +94,24 @@ fn pre_process_line(line_content: &str, line_number: usize) -> JuvinilResult<Vec
 }
 
 fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {
-    if let Some(keyword) = keyword::KEYWORDS.get(token) {
-        return Ok(Token::from_keyword(keyword));
+    if let Some(keyword) = token::KEYWORDS.iter().find(|&x| *x == token) {
+        return Ok(Token::new_keyword(String::from(*keyword)));
     }
 
-    if let Some(operator) = operators::OPERATORS.get(token) {
-        return Ok(Token::from_operator(operator));
+    if let Some(operator) = token::OPERATORS.iter().find(|&x| *x == token) {
+        return Ok(Token::new_operator(String::from(*operator)));
     }
 
-    if let Some(jv_type) = jv_types::JV_TYPES.get(token) {
-        return Ok(Token::from_type(jv_type));
+    if let Some(jv_type) = token::JV_TYPES.iter().find(|&x| *x == token) {
+        return Ok(Token::new_type(String::from(*jv_type)));
     }
 
-    if let Some(symbol) = symbols::SYMBOLS.get(token) {
-        return Ok(Token::from_symbol(symbol));
+    if let Some(symbol) = token::SYMBOLS.iter().find(|&x| *x == token) {
+        return Ok(Token::new_symbol(String::from(*symbol)));
     }
 
-    if let Some(comparator) = comparators::COMPARATORS.get(token) {
-        return Ok(Token::from_comparator(comparator));
+    if let Some(comparator) = token::COMPARATORS.iter().find(|&x| *x == token) {
+        return Ok(Token::new_comparator(String::from(*comparator)));
     }
 
     let regex_token = regex_token::REGEX_TOKEN_MAP

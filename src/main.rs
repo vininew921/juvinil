@@ -1,6 +1,6 @@
 use std::fs;
 
-use juvinil::{error::JuvinilResult, lexical_analysis::lex};
+use juvinil::{error::JuvinilResult, lexical_analysis::lex, syntax_analysis::parser::Parser};
 
 fn main() {
     tracing_subscriber::fmt().pretty().init();
@@ -17,8 +17,12 @@ fn run(file_path: &str) -> JuvinilResult<()> {
     tracing::info!("Successfully read contents of file {}", file_path);
 
     tracing::info!("--------LEXICAL ANALYSIS--------");
-    let _ = lex::tokenize(file)?;
+    let tokens = lex::tokenize(file)?;
     tracing::info!("Successfully tokenized file contents");
+
+    let mut parser = Parser::new(tokens);
+    parser.parse()?;
+    tracing::info!("Successfully parsed file contents");
 
     Ok(())
 }
