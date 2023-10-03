@@ -3,10 +3,13 @@ use crate::{
     lexical_analysis::token::{Token, TokenType},
 };
 
+use super::parser_map::ParserMap;
+
 pub struct Parser {
     tokens: Vec<Token>,
     pos: i32,
     current_token: Option<Token>,
+    _parser_map: ParserMap,
 }
 
 impl Parser {
@@ -15,6 +18,7 @@ impl Parser {
             tokens,
             pos: -1,
             current_token: None,
+            _parser_map: ParserMap::new(),
         };
 
         parser.next();
@@ -88,28 +92,55 @@ impl Parser {
     }
 
     fn block(&mut self) -> JuvinilResult<()> {
-        Ok(())
+        self.consume(TokenType::SYMBOL, Some("{"))?;
+        self.decls()?;
+        self.stmts()?;
+        self.consume(TokenType::SYMBOL, Some("}"))
     }
 
     fn decls(&mut self) -> JuvinilResult<()> {
+        while self.verify_current(TokenType::TYPE, None) {
+            self.decl()?;
+        }
+
         Ok(())
+    }
+
+    fn decl(&mut self) -> JuvinilResult<()> {
+        self.jvtype()?;
+        self.consume(TokenType::ID, None)?;
+        self.endexpr()
     }
 
     fn stmts(&mut self) -> JuvinilResult<()> {
+        self.stmt()
+    }
+
+    fn stmt(&mut self) -> JuvinilResult<()> {
+        if self.verify_current(TokenType::ID, None) {
+            self.asgn()?;
+        }
+
         Ok(())
     }
 
-    fn _decl(&mut self) -> JuvinilResult<()> {
+    fn jvtype(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::TYPE, None)?;
-        self.consume(TokenType::ID, None)
+        if self.verify_current(TokenType::SYMBOL, Some("[")) {
+            self.consume(TokenType::SYMBOL, Some("["))?;
+            self.consume(TokenType::NUMBER, None)?;
+            self.consume(TokenType::SYMBOL, Some("]"))?;
+        }
+
+        Ok(())
     }
 
-    fn _asgn(&mut self) -> JuvinilResult<()> {
-        self._decl()?;
+    fn asgn(&mut self) -> JuvinilResult<()> {
+        self.consume(TokenType::ID, None)?;
         self.consume(TokenType::OPERATOR, Some("="))
     }
 
-    fn _endexpr(&mut self) -> JuvinilResult<()> {
+    fn endexpr(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::SYMBOL, Some(";"))
     }
 }
