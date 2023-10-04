@@ -9,7 +9,6 @@ pub struct Parser {
     tokens: Vec<Token>,
     pos: i32,
     current_token: Option<Token>,
-    _parser_map: ParserMap,
 }
 
 impl Parser {
@@ -18,7 +17,6 @@ impl Parser {
             tokens,
             pos: -1,
             current_token: None,
-            _parser_map: ParserMap::new(),
         };
 
         parser.next();
@@ -77,14 +75,18 @@ impl Parser {
         Ok(values)
     }
 
+    //program -> block
+    //program -> decls
+    //program -> stmts
     fn program(&mut self) -> JuvinilResult<()> {
         match self.get_current_values()? {
             (TokenType::SYMBOL, "{") => return self.block(),
             (TokenType::TYPE, ..) => return self.decls(),
-            _ => return self.decls(),
+            _ => return self.stmts(),
         }
     }
 
+    //block -> { decls stmts }
     fn block(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::SYMBOL, Some("{"))?;
         self.decls()?;
@@ -92,6 +94,7 @@ impl Parser {
         self.consume(TokenType::SYMBOL, Some("}"))
     }
 
+    //decls -> decls decl
     fn decls(&mut self) -> JuvinilResult<()> {
         while self.get_current_values()?.0 == TokenType::TYPE {
             self.decl()?;
@@ -100,16 +103,19 @@ impl Parser {
         Ok(())
     }
 
+    //decl -> type ID endexpr
     fn decl(&mut self) -> JuvinilResult<()> {
         self.jvtype()?;
         self.consume(TokenType::ID, None)?;
         self.endexpr()
     }
 
+    //stmts -> stmts stmt
     fn stmts(&mut self) -> JuvinilResult<()> {
         self.stmt()
     }
 
+    //TO DO: mapping
     fn stmt(&mut self) -> JuvinilResult<()> {
         match self.get_current_values()? {
             (TokenType::ID, ..) => self.asgn()?,
@@ -119,26 +125,33 @@ impl Parser {
         Ok(())
     }
 
+    //type -> TYPE
+    //type -> TYPE array_decl
     fn jvtype(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::TYPE, None)?;
 
         match self.get_current_values()? {
-            (TokenType::SYMBOL, "[") => {
-                self.consume(TokenType::SYMBOL, Some("["))?;
-                self.consume(TokenType::NUMBER, None)?;
-                self.consume(TokenType::SYMBOL, Some("]"))?;
-            }
+            (TokenType::SYMBOL, "[") => self.array_decl()?,
             _ => (),
         }
 
         Ok(())
     }
 
+    //array_decl -> [ NUMBER ]
+    fn array_decl(&mut self) -> JuvinilResult<()> {
+        self.consume(TokenType::SYMBOL, Some("["))?;
+        self.consume(TokenType::NUMBER, None)?;
+        self.consume(TokenType::SYMBOL, Some("]"))
+    }
+
+    //asgn -> ID =
     fn asgn(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::ID, None)?;
         self.consume(TokenType::OPERATOR, Some("="))
     }
 
+    //endexpr -> ;
     fn endexpr(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::SYMBOL, Some(";"))
     }

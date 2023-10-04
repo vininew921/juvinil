@@ -1,5 +1,7 @@
+{
     int [ 3 ] abc;
     int def;
     int ghi;
     int jkl;
     int mno;
+} 
