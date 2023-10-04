@@ -67,28 +67,22 @@ impl Parser {
         Ok(())
     }
 
-    fn verify_current(&mut self, token_type: TokenType, value: Option<&str>) -> bool {
-        if let Some(ct) = self.current_token.clone() {
-            if value.is_none() {
-                return ct.token_type == token_type;
-            }
-
-            return ct.token_type == token_type && ct.value.as_str() == value.unwrap();
+    fn get_current_values(&self) -> JuvinilResult<(TokenType, &str)> {
+        if let None = self.current_token {
+            return Err(JuvinilError::ParsingError);
         }
 
-        return false;
+        let values = self.current_token.as_ref().unwrap().values();
+
+        Ok(values)
     }
 
     fn program(&mut self) -> JuvinilResult<()> {
-        if self.verify_current(TokenType::SYMBOL, Some("{")) {
-            return self.block();
+        match self.get_current_values()? {
+            (TokenType::SYMBOL, "{") => return self.block(),
+            (TokenType::TYPE, ..) => return self.decls(),
+            _ => return self.decls(),
         }
-
-        if self.verify_current(TokenType::TYPE, None) {
-            return self.decls();
-        }
-
-        self.stmts()
     }
 
     fn block(&mut self) -> JuvinilResult<()> {
@@ -99,7 +93,7 @@ impl Parser {
     }
 
     fn decls(&mut self) -> JuvinilResult<()> {
-        while self.verify_current(TokenType::TYPE, None) {
+        while self.get_current_values()?.0 == TokenType::TYPE {
             self.decl()?;
         }
 
@@ -117,8 +111,9 @@ impl Parser {
     }
 
     fn stmt(&mut self) -> JuvinilResult<()> {
-        if self.verify_current(TokenType::ID, None) {
-            self.asgn()?;
+        match self.get_current_values()? {
+            (TokenType::ID, ..) => self.asgn()?,
+            _ => (),
         }
 
         Ok(())
@@ -126,10 +121,14 @@ impl Parser {
 
     fn jvtype(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::TYPE, None)?;
-        if self.verify_current(TokenType::SYMBOL, Some("[")) {
-            self.consume(TokenType::SYMBOL, Some("["))?;
-            self.consume(TokenType::NUMBER, None)?;
-            self.consume(TokenType::SYMBOL, Some("]"))?;
+
+        match self.get_current_values()? {
+            (TokenType::SYMBOL, "[") => {
+                self.consume(TokenType::SYMBOL, Some("["))?;
+                self.consume(TokenType::NUMBER, None)?;
+                self.consume(TokenType::SYMBOL, Some("]"))?;
+            }
+            _ => (),
         }
 
         Ok(())

@@ -83,6 +83,10 @@ impl Token {
     pub fn eof() -> Self {
         Token::new(TokenType::EOF, "".into())
     }
+
+    pub fn values(&self) -> (TokenType, &str) {
+        (self.token_type.clone(), self.value.as_str())
+    }
 }
 
 impl std::fmt::Debug for Token {
