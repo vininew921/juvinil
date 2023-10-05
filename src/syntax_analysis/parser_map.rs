@@ -34,8 +34,31 @@ impl ParserMap {
         let mut follow: HashMap<LangInstructions, Vec<String>> = HashMap::new();
         let mut lookahead: HashMap<LangInstructions, Vec<String>> = HashMap::new();
 
-        first.insert(LangInstructions::DECL, vec!["decl".into()]);
-        first.insert(LangInstructions::FUNC, vec!["func".into()]);
+        //FIRST map
+        let block_first = vec!["{"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
+
+        let decls_first = vec!["int", "float", "boolean", "char", "string"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>();
+
+        let decl_first = decls_first.clone();
+
+        let stmts_first = vec![
+            "{", "if", "while", "do", "break", "continue", "true", "false",
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<String>>();
+
+        let stmt_first = stmts_first.clone();
+
+        first.insert(LangInstructions::BLOCK, block_first);
+        first.insert(LangInstructions::DECL, decl_first);
+        first.insert(LangInstructions::STMT, stmt_first);
 
         Self {
             first,
