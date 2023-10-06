@@ -1,0 +1,41 @@
+!--! FIRST
+program -> { func int float boolean char string _ID_ if while do break continue true false
+block -> {
+decls -> int float boolean char string
+decl -> int float boolean char string
+type -> int float boolean char string
+basic -> void int float boolean char string
+num -> _NUM_
+real -> _NUM_
+stmts -> _ID_ { if while do break continue true false
+stmt -> _ID_ { if while do break continue true false
+asgn -> _ID_
+func -> _ID_
+params -> _ID_ - ++ -- ( true false _NUM_
+funcdecl -> func
+paramsdecl -> int float boolean char string
+boolexpr -> ! - ++ -- ( true false NUM ID
+join -> ! - ++ -- ( true false NUM ID
+equality -> ! - ++ -- ( true false NUM ID
+cmp -> ! - ++ -- ( true false NUM ID
+expr -> ! - ++ -- ( true false NUM ID
+brn -> ! - ++ -- ( true false NUM ID
+term -> ! - ++ -- ( true false NUM ID
+unit -> ! - ++ -- ( true false NUM ID
+factor -> ! - ++ -- ( true false NUM ID
+!--! FOLLOW
+block -> }
+decls -> _ID_ { func int float boolean char string if while do break continue true false
+decl -> _ID_ { func int float boolean char string if while do break continue true false
+type -> _ID_ { func int float boolean char string if while do break continue true false
+basic -> _ID_ { func int float boolean char string if while do break continue true false
+num -> ; ] &&
+real -> ; ] &&
+stmts -> }
+stmt -> ID { if while do break continue true false }
+asgn -> ;
+func -> ;
+params -> )
+funcdecl -> ;
+paramsdecl -> ID { func int float boolean char string
+
