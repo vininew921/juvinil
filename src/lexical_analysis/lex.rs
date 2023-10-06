@@ -10,7 +10,7 @@ use super::{regex_token, token};
 pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
     let mut tokens: Vec<Token> = Vec::new();
 
-    for (line_number, line_content) in content.lines().enumerate().into_iter() {
+    for (line_number, line_content) in content.lines().enumerate() {
         if line_content.trim().is_empty() {
             continue;
         }

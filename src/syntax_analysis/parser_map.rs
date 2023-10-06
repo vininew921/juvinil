@@ -1,69 +1,63 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fs};
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy)]
-pub enum LangInstructions {
-    DECL,
-    STMT,
-    ASGN,
-    BLOCK,
-    JVTYPE,
-    FUNC,
-    PARAMS,
-    FUNCDECL,
-    PARAMDECL,
-    BOOLEXPR,
-    JOIN,
-    EQUALITY,
-    CMP,
-    EXPR,
-    BRN,
-    TERM,
-    UNIT,
-    FACTOR,
-}
+use crate::error::JuvinilResult;
 
 pub struct ParserMap {
-    first: HashMap<LangInstructions, Vec<String>>,
-    follow: HashMap<LangInstructions, Vec<String>>,
-    lookahead: HashMap<LangInstructions, Vec<String>>,
+    pub first: HashMap<String, Vec<String>>,
+    pub follow: HashMap<String, Vec<String>>,
+    pub lookahead: HashMap<String, Vec<String>>,
 }
 
 impl ParserMap {
-    pub fn new() -> Self {
-        let mut first: HashMap<LangInstructions, Vec<String>> = HashMap::new();
-        let mut follow: HashMap<LangInstructions, Vec<String>> = HashMap::new();
-        let mut lookahead: HashMap<LangInstructions, Vec<String>> = HashMap::new();
+    pub fn new() -> JuvinilResult<Self> {
+        let lang_map = fs::read_to_string("lang.map")?;
 
-        //FIRST map
-        let block_first = vec!["{"]
-            .iter()
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>();
+        let mut first: HashMap<String, Vec<String>> = HashMap::new();
+        let mut follow: HashMap<String, Vec<String>> = HashMap::new();
+        let mut lookahead: HashMap<String, Vec<String>> = HashMap::new();
 
-        let decls_first = vec!["int", "float", "boolean", "char", "string"]
-            .iter()
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>();
+        let mut counter = -1;
 
-        let decl_first = decls_first.clone();
+        for line_content in lang_map.lines().into_iter() {
+            if line_content.starts_with("!--!") {
+                counter = counter + 1;
+                continue;
+            }
 
-        let stmts_first = vec![
-            "{", "if", "while", "do", "break", "continue", "true", "false",
-        ]
-        .iter()
-        .map(|s| s.to_string())
-        .collect::<Vec<String>>();
+            let mut content = line_content.split("->");
+            let key = content.next().unwrap().trim();
+            let elements: Vec<String> = content
+                .to_owned()
+                .next()
+                .unwrap()
+                .split_whitespace()
+                .map(|x| x.to_string())
+                .collect();
 
-        let stmt_first = stmts_first.clone();
+            match counter {
+                0 => first.insert(key.into(), elements),
+                1 => follow.insert(key.into(), elements),
+                2 => lookahead.insert(key.into(), elements),
+                _ => panic!("FOdeu"),
+            };
+        }
 
-        first.insert(LangInstructions::BLOCK, block_first);
-        first.insert(LangInstructions::DECL, decl_first);
-        first.insert(LangInstructions::STMT, stmt_first);
+        for value in first.clone() {
+            tracing::info!("First: {:?}", value);
+        }
 
-        Self {
+        for value in follow.clone() {
+            tracing::info!("Follow: {:?}", value);
+        }
+
+        for value in lookahead.clone() {
+            tracing::info!("Lookahead: {:?}", value);
+        }
+
+        Ok(Self {
             first,
             follow,
             lookahead,
-        }
+        })
     }
 }

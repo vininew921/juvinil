@@ -9,19 +9,21 @@ pub struct Parser {
     tokens: Vec<Token>,
     pos: i32,
     current_token: Option<Token>,
+    map: ParserMap,
 }
 
 impl Parser {
-    pub fn new(tokens: Vec<Token>) -> Self {
+    pub fn new(tokens: Vec<Token>) -> JuvinilResult<Self> {
         let mut parser = Parser {
             tokens,
             pos: -1,
             current_token: None,
+            map: ParserMap::new()?,
         };
 
         parser.next();
 
-        parser
+        Ok(parser)
     }
 
     pub fn parse(&mut self) -> JuvinilResult<()> {
