@@ -1,19 +1,19 @@
 use super::regex_token::RegexToken;
 
-pub const KEYWORDS: [&'static str; 12] = [
+pub const KEYWORDS: [&str; 12] = [
     "func", "return", "if", "else", "for", "while", "break", "continue", "switch", "case", "true",
     "false",
 ];
 
-pub const OPERATORS: [&'static str; 13] = [
+pub const OPERATORS: [&str; 13] = [
     "=", "+", "-", "*", "/", "%", "!", "&", "|", "++", "--", "+=", "-=",
 ];
 
-pub const JV_TYPES: [&'static str; 6] = ["void", "int", "float", "boolean", "char", "string"];
+pub const JV_TYPES: [&str; 6] = ["void", "int", "float", "boolean", "char", "string"];
 
-pub const SYMBOLS: [&'static str; 7] = [";", "(", ")", "[", "]", "{", "}"];
+pub const SYMBOLS: [&str; 7] = [";", "(", ")", "[", "]", "{", "}"];
 
-pub const COMPARATORS: [&'static str; 8] = ["&&", "||", "==", "!=", "<", ">", ">=", "<="];
+pub const COMPARATORS: [&str; 8] = ["&&", "||", "==", "!=", "<", ">", ">=", "<="];
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
@@ -64,7 +64,7 @@ impl Token {
     }
 
     pub fn new_string(value: String) -> Self {
-        Token::new(TokenType::STRING, value.replace(r#"""#, ""))
+        Token::new(TokenType::STRING, value.replace('"', ""))
     }
 
     pub fn new_number(value: String) -> Self {

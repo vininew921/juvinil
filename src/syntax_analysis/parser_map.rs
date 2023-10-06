@@ -18,9 +18,9 @@ impl ParserMap {
 
         let mut counter = -1;
 
-        for line_content in lang_map.lines().into_iter() {
+        for line_content in lang_map.lines() {
             if line_content.starts_with("!--!") {
-                counter = counter + 1;
+                counter += 1;
                 continue;
             }
 

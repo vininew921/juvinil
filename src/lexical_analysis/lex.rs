@@ -41,7 +41,7 @@ fn pre_process_line(line_content: &str, line_number: usize) -> JuvinilResult<Vec
     let mut inside_string = false;
     let mut complete_string = String::new();
 
-    for word in line_content.trim().split_whitespace() {
+    for word in line_content.split_whitespace() {
         if word.starts_with('\"') {
             inside_string = true;
         }

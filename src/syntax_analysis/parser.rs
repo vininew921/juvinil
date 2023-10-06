@@ -9,7 +9,7 @@ pub struct Parser {
     tokens: Vec<Token>,
     pos: i32,
     current_token: Option<Token>,
-    map: ParserMap,
+    _map: ParserMap,
 }
 
 impl Parser {
@@ -18,7 +18,7 @@ impl Parser {
             tokens,
             pos: -1,
             current_token: None,
-            map: ParserMap::new()?,
+            _map: ParserMap::new()?,
         };
 
         parser.next();
@@ -58,7 +58,7 @@ impl Parser {
             return Err(JuvinilError::SyntaxError);
         }
 
-        if value.is_some() && ref_self.value.to_owned() != value.unwrap() {
+        if value.is_some() && ref_self.value != value.unwrap() {
             return Err(JuvinilError::SyntaxError);
         }
 
@@ -68,7 +68,7 @@ impl Parser {
     }
 
     fn get_current_values(&self) -> JuvinilResult<(TokenType, &str)> {
-        if let None = self.current_token {
+        if self.current_token.is_none() {
             return Err(JuvinilError::ParsingError);
         }
 
@@ -82,9 +82,9 @@ impl Parser {
     //program -> stmts
     fn program(&mut self) -> JuvinilResult<()> {
         match self.get_current_values()? {
-            (TokenType::SYMBOL, "{") => return self.block(),
-            (TokenType::TYPE, ..) => return self.decls(),
-            _ => return self.stmts(),
+            (TokenType::SYMBOL, "{") => self.block(),
+            (TokenType::TYPE, ..) => self.decls(),
+            _ => self.stmts(),
         }
     }
 
@@ -119,9 +119,8 @@ impl Parser {
 
     //TO DO: mapping
     fn stmt(&mut self) -> JuvinilResult<()> {
-        match self.get_current_values()? {
-            (TokenType::ID, ..) => self.asgn()?,
-            _ => (),
+        if let (TokenType::ID, ..) = self.get_current_values()? {
+            self.asgn()?
         }
 
         Ok(())
@@ -132,9 +131,8 @@ impl Parser {
     fn jvtype(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::TYPE, None)?;
 
-        match self.get_current_values()? {
-            (TokenType::SYMBOL, "[") => self.array_decl()?,
-            _ => (),
+        if let (TokenType::SYMBOL, "[") = self.get_current_values()? {
+            self.array_decl()?
         }
 
         Ok(())
