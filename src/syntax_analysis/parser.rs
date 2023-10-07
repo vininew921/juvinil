@@ -8,8 +8,8 @@ use super::parser_map::ParserMap;
 pub struct Parser {
     tokens: Vec<Token>,
     pos: i32,
-    current_token: Option<Token>,
-    _map: ParserMap,
+    current_token: Token,
+    map: ParserMap,
 }
 
 impl Parser {
@@ -17,8 +17,8 @@ impl Parser {
         let mut parser = Parser {
             tokens,
             pos: -1,
-            current_token: None,
-            _map: ParserMap::new()?,
+            current_token: Token::new(TokenType::EOF, String::new()),
+            map: ParserMap::new()?,
         };
 
         parser.next();
@@ -43,23 +43,26 @@ impl Parser {
             tracing::info!("Next: {:?}", next);
         }
 
-        self.current_token = Some(res.unwrap().clone());
+        self.current_token = res.unwrap().clone();
 
         res
     }
 
     fn consume(&mut self, token_type: TokenType, value: Option<&str>) -> JuvinilResult<()> {
-        let ref_self = self
-            .current_token
-            .as_ref()
-            .ok_or(JuvinilError::ParsingError)?;
-
-        if ref_self.token_type != token_type {
-            return Err(JuvinilError::SyntaxError);
+        if self.current_token.token_type != token_type {
+            return Err(JuvinilError::SyntaxError(
+                token_type,
+                value.unwrap_or_default().into(),
+                self.current_token.clone(),
+            ));
         }
 
-        if value.is_some() && ref_self.value != value.unwrap() {
-            return Err(JuvinilError::SyntaxError);
+        if value.is_some() && self.current_token.value != value.unwrap() {
+            return Err(JuvinilError::SyntaxError(
+                token_type,
+                value.unwrap_or_default().into(),
+                self.current_token.clone(),
+            ));
         }
 
         self.next();
@@ -67,25 +70,19 @@ impl Parser {
         Ok(())
     }
 
-    fn get_current_values(&self) -> JuvinilResult<(TokenType, &str)> {
-        if self.current_token.is_none() {
-            return Err(JuvinilError::ParsingError);
-        }
-
-        let values = self.current_token.as_ref().unwrap().values();
-
-        Ok(values)
-    }
-
     //program -> block
     //program -> decls
     //program -> stmts
     fn program(&mut self) -> JuvinilResult<()> {
-        match self.get_current_values()? {
-            (TokenType::SYMBOL, "{") => self.block(),
-            (TokenType::TYPE, ..) => self.decls(),
-            _ => self.stmts(),
+        if self.map.is_first("block", &self.current_token) {
+            return self.block();
         }
+
+        if self.map.is_first("decls", &self.current_token) {
+            return self.decls();
+        }
+
+        self.stmts()
     }
 
     //block -> { decls stmts }
@@ -98,7 +95,7 @@ impl Parser {
 
     //decls -> decls decl
     fn decls(&mut self) -> JuvinilResult<()> {
-        while self.get_current_values()?.0 == TokenType::TYPE {
+        while self.map.is_first("decl", &self.current_token) {
             self.decl()?;
         }
 
@@ -119,7 +116,7 @@ impl Parser {
 
     //TO DO: mapping
     fn stmt(&mut self) -> JuvinilResult<()> {
-        if let (TokenType::ID, ..) = self.get_current_values()? {
+        if self.map.is_first("asgn", &self.current_token) {
             self.asgn()?
         }
 
@@ -131,7 +128,7 @@ impl Parser {
     fn jvtype(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::TYPE, None)?;
 
-        if let (TokenType::SYMBOL, "[") = self.get_current_values()? {
+        if self.map.is_follow("type", &self.current_token) {
             self.array_decl()?
         }
 

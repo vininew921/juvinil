@@ -1,20 +1,23 @@
 use std::{collections::HashMap, fs};
 
-use crate::error::JuvinilResult;
+use crate::{
+    error::JuvinilResult,
+    lexical_analysis::token::{Token, TokenType},
+};
 
 pub struct ParserMap {
-    pub first: HashMap<String, Vec<String>>,
-    pub follow: HashMap<String, Vec<String>>,
-    pub lookahead: HashMap<String, Vec<String>>,
+    first: HashMap<Box<str>, Vec<String>>,
+    follow: HashMap<Box<str>, Vec<String>>,
+    lookahead: HashMap<Box<str>, Vec<String>>,
 }
 
 impl ParserMap {
     pub fn new() -> JuvinilResult<Self> {
         let lang_map = fs::read_to_string("lang.map")?;
 
-        let mut first: HashMap<String, Vec<String>> = HashMap::new();
-        let mut follow: HashMap<String, Vec<String>> = HashMap::new();
-        let mut lookahead: HashMap<String, Vec<String>> = HashMap::new();
+        let mut first: HashMap<Box<str>, Vec<String>> = HashMap::new();
+        let mut follow: HashMap<Box<str>, Vec<String>> = HashMap::new();
+        let mut lookahead: HashMap<Box<str>, Vec<String>> = HashMap::new();
 
         let mut counter = -1;
 
@@ -35,23 +38,11 @@ impl ParserMap {
                 .collect();
 
             match counter {
-                0 => first.insert(key.into(), elements),
-                1 => follow.insert(key.into(), elements),
-                2 => lookahead.insert(key.into(), elements),
+                0 => first.insert(key.clone().into(), elements),
+                1 => follow.insert(key.clone().into(), elements),
+                2 => lookahead.insert(key.clone().into(), elements),
                 _ => panic!("FOdeu"),
             };
-        }
-
-        for value in first.clone() {
-            tracing::info!("First: {:?}", value);
-        }
-
-        for value in follow.clone() {
-            tracing::info!("Follow: {:?}", value);
-        }
-
-        for value in lookahead.clone() {
-            tracing::info!("Lookahead: {:?}", value);
         }
 
         Ok(Self {
@@ -59,5 +50,53 @@ impl ParserMap {
             follow,
             lookahead,
         })
+    }
+
+    pub fn is_first(&self, entry_type: &str, token: &Token) -> bool {
+        let mut str_value = token.value.clone();
+
+        match token.token_type {
+            TokenType::ID => str_value = "_ID_".to_string(),
+            TokenType::NUMBER => str_value = "_NUM_".to_string(),
+            _ => (),
+        };
+
+        if let Some(entry) = self.first.get(entry_type) {
+            return entry.iter().any(|e| str_value.contains(e));
+        }
+
+        false
+    }
+
+    pub fn is_follow(&self, entry_type: &str, token: &Token) -> bool {
+        let mut str_value = token.value.clone();
+
+        match token.token_type {
+            TokenType::ID => str_value = "_ID_".to_string(),
+            TokenType::NUMBER => str_value = "_NUM_".to_string(),
+            _ => (),
+        };
+
+        if let Some(entry) = self.follow.get(entry_type) {
+            return entry.iter().any(|e| str_value.contains(e));
+        }
+
+        false
+    }
+
+    pub fn is_lookahead(&self, entry_type: &str, token: &Token) -> bool {
+        let mut str_value = token.value.clone();
+
+        match token.token_type {
+            TokenType::ID => str_value = "_ID_".to_string(),
+            TokenType::NUMBER => str_value = "_NUM_".to_string(),
+            _ => (),
+        };
+
+        if let Some(entry) = self.lookahead.get(entry_type) {
+            return entry.iter().any(|e| str_value.contains(e));
+        }
+
+        false
     }
 }

@@ -26,7 +26,7 @@ factor -> ! - ++ -- ( true false _NUM_ ID
 block -> }
 decls -> _ID_ { func int float boolean char string if while do break continue true false
 decl -> _ID_ { func int float boolean char string if while do break continue true false
-type -> _ID_ { func int float boolean char string if while do break continue true false
+type -> [
 basic -> _ID_ { func int float boolean char string if while do break continue true false
 num -> ; ] && ||
 real -> ; ] && ||
