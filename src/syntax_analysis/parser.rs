@@ -75,11 +75,11 @@ impl Parser {
     //program -> stmts
     fn program(&mut self) -> JuvinilResult<()> {
         if self.map.is_first("block", &self.current_token) {
-            return self.block();
+            self.block()?
         }
 
         if self.map.is_first("decls", &self.current_token) {
-            return self.decls();
+            self.decls()?
         }
 
         self.stmts()
@@ -121,6 +121,46 @@ impl Parser {
         }
 
         Ok(())
+    }
+
+    fn unit(&mut self) -> JuvinilResult<()> {
+        self.factor()
+    }
+
+    fn boolexpr(&mut self) -> JuvinilResult<()> {
+        self.consume(TokenType::ID, None) //TODO
+    }
+
+    fn func(&mut self) -> JuvinilResult<()> {
+        self.consume(TokenType::ID, None) //TODO
+    }
+
+    fn num(&mut self) -> JuvinilResult<()> {
+        self.consume(TokenType::NUMBER, None)
+    }
+
+    fn factor(&mut self) -> JuvinilResult<()> {
+        if self.current_token.value == "(" {
+            self.consume(TokenType::SYMBOL, Some("("))?;
+            self.boolexpr()?;
+            self.consume(TokenType::SYMBOL, Some(")"))?
+        }
+
+        match self.current_token.token_type {
+            TokenType::ID => self.func()?,
+            TokenType::KEYWORD => self.primitive_bool()?,
+            _ => (),
+        }
+
+        self.num()
+    }
+
+    fn primitive_bool(&mut self) -> JuvinilResult<()> {
+        if self.current_token.value == "true" {
+            self.consume(TokenType::KEYWORD, Some("true"))?
+        }
+
+        self.consume(TokenType::KEYWORD, Some("false"))
     }
 
     //type -> TYPE
