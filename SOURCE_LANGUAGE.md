@@ -64,7 +64,6 @@
 | _func_ |  **ID (** _params_ **)** **;** |
 | _params_ |  **ID,** _params_|
 | _params_ |  **ID** |
-| _params_ |  _expr_ |
 | _params_ | **ε** |
 | _funcdecl_ | **func** _type_ **ID (** _paramsdecl_ **)** _block_ |
 | _paramsdecl_ | _type_ **ID** **,** _paramsdecl_|
