@@ -44,6 +44,7 @@
 | _stmts_ | _stmts_ _stmt_ |
 | _stmt_ | _asgn_ |
 | _stmt_ | _block_ |
+| _stmt_ | _func_ |
 | _stmt_ | _funcdecl_ |
 | _stmt_ | **if** **(** _boolexpr_ **)** _block_ |
 | _stmt_ | **if** **(** _boolexpr_ **)** _block_ **else** _block_ |
