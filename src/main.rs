@@ -20,6 +20,7 @@ fn run(file_path: &str) -> JuvinilResult<()> {
     let tokens = lex::tokenize(file)?;
     tracing::info!("Successfully tokenized file contents");
 
+    tracing::info!("--------SYNTAX ANALYSIS--------");
     let mut parser = Parser::new(tokens)?;
     parser.parse()?;
     tracing::info!("Successfully parsed file contents");
