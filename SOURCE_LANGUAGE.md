@@ -1,4 +1,4 @@
-### General
+### Source Language
 
 | From | To |
 | -- | -- |
@@ -21,10 +21,6 @@
 | -- | -- |
 | _type_ | _type_ **\[** _num_ **]** |
 | _type_ | _basic_ |
-
-
-| From | To |
-| -- | -- |
 | _basic_ | **void** |
 | _basic_ | **int** |
 | _basic_ | **float** |
@@ -48,6 +44,7 @@
 | _stmts_ | _stmts_ _stmt_ |
 | _stmt_ | _asgn_ |
 | _stmt_ | _block_ |
+| _stmt_ | _funcdecl_ |
 | _stmt_ | **if** **(** _boolexpr_ **)** _block_ |
 | _stmt_ | **if** **(** _boolexpr_ **)** _block_ **else** _block_ |
 | _stmt_ | **while** **(** _boolexpr_ **)** _block_ |
@@ -95,7 +92,6 @@
 | _term_ | _term_ **\*** _unit_ |
 | _term_ | _term_ **\/** _unit_ |
 | _term_ | _term_ **%** _unit_ |
-| _unit_ | **!** unit |
 | _unit_ | **-** unit |
 | _unit_ | **++** unit |
 | _unit_ | **--** unit |
@@ -105,6 +101,4 @@
 | _factor_ | _num_  |
 | _factor_ | _real_  |
 | _factor_ | _func_  |
-| _factor_ | **true**  |
-| _factor_ | **false**  |
 

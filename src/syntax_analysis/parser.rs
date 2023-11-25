@@ -111,7 +111,11 @@ impl Parser {
 
     //stmts -> stmts stmt
     fn stmts(&mut self) -> JuvinilResult<()> {
-        self.stmt()
+        while self.map.is_first("stmt", &self.current_token) {
+            self.stmt()?;
+        }
+
+        Ok(())
     }
 
     //TO DO: mapping
