@@ -76,6 +76,8 @@ impl Parser {
 impl Parser {
     //Program is the first parse instruction of the whole file
     fn program(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING PROGRAM");
+
         //If the current token is an open bracket ({),
         //we're looking at a block
         if self.current_token.value == "{" {
@@ -95,6 +97,8 @@ impl Parser {
 
     //block -> { decls stmts }
     fn block(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING BLOCK");
+
         self.consume(TokenType::SYMBOL, Some("{"))?;
         self.decls()?;
         self.stmts()?;
@@ -105,6 +109,8 @@ impl Parser {
 
     //decls -> decls decl
     fn decls(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING DECLS");
+
         //We run the declaration parsing until we no longer
         //have a TYPE as the current
         while self.current_token.token_type == TokenType::TYPE {
@@ -116,6 +122,8 @@ impl Parser {
 
     //decl -> TYPE ID endexpr
     fn decl(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING DECL");
+
         self.jvtype()?;
         self.consume(TokenType::ID, None)?;
         self.endexpr()?;
@@ -125,6 +133,8 @@ impl Parser {
 
     //stmts -> stmts stmt
     fn stmts(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING STMTS");
+
         //Parse a statement if the current token is one
         //of the following values or types
         let stmt_values = ["if", "while", "do", "break", "continue", "{", "func"];
@@ -141,20 +151,22 @@ impl Parser {
 
     //Statement can be pretty much everything that is not a declaration
     fn stmt(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING STMT");
+
         //If current token is an ID, we're either looking at a function call (func)
         //or a assignment (asgn)
         if self.current_token.token_type == TokenType::ID {
-            self.consume(TokenType::ID, None)?;
+            if let Some(lookahead) = self.lookahead.clone() {
+                //It's a function call if the lookahead token is a parenthesis
+                if lookahead.value == "(" {
+                    self.func()?;
 
-            //It's a function call if the current token is a parenthesis
-            if self.current_token.value == "(" {
-                self.func()?;
+                    return Ok(());
+                }
 
-                return Ok(());
+                //Otherwise, it's an assignment
+                self.asgn()?;
             }
-
-            //Otherwise, it's an assignment
-            self.asgn()?;
 
             return Ok(());
         }
@@ -205,6 +217,8 @@ impl Parser {
 
     //Parse an if expression
     fn stmt_if(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING STMT_IF");
+
         self.consume(TokenType::KEYWORD, Some("if"))?;
         self.consume(TokenType::SYMBOL, Some("("))?;
         self.boolexpr()?;
@@ -220,6 +234,8 @@ impl Parser {
 
     //Parse a while expression
     fn stmt_while(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING STMT_WHILE");
+
         self.consume(TokenType::KEYWORD, Some("while"))?;
         self.consume(TokenType::SYMBOL, Some("("))?;
         self.boolexpr()?;
@@ -231,6 +247,8 @@ impl Parser {
 
     //Parse a do while expression
     fn stmt_do_while(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING STMT_DO_WHILE");
+
         self.consume(TokenType::KEYWORD, Some("do"))?;
         self.block()?;
         self.consume(TokenType::KEYWORD, Some("while"))?;
@@ -244,11 +262,15 @@ impl Parser {
 
     //Parse a boolean expression TODO
     fn boolexpr(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING BOOLEXPR");
+
         Ok(())
     }
 
     //Parse an expression
     fn expr(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING EXPR");
+
         //An expr will always end up as a bnr
         self.bnr()?;
 
@@ -264,6 +286,8 @@ impl Parser {
     }
 
     fn bnr(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING BNR");
+
         //a bnr will always end up in a term
         self.term()?;
 
@@ -279,6 +303,8 @@ impl Parser {
     }
 
     fn term(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING TERM");
+
         //a term will always end up in a unit
         self.unit()?;
 
@@ -297,6 +323,8 @@ impl Parser {
     }
 
     fn unit(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING UNIT");
+
         let unit_values = ["-", "++", "--"];
         if unit_values.contains(&self.current_token.value.as_str()) {
             self.consume(TokenType::OPERATOR, None)?;
@@ -312,6 +340,8 @@ impl Parser {
     }
 
     fn factor(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING FACTOR");
+
         if self.current_token.token_type == TokenType::NUMBER {
             self.consume(TokenType::NUMBER, None)?;
             return Ok(());
@@ -333,6 +363,8 @@ impl Parser {
 
     //Parse a function declaration
     fn funcdecl(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING FUNCDECL");
+
         self.consume(TokenType::KEYWORD, Some("func"))?;
         self.consume(TokenType::TYPE, None)?;
         self.consume(TokenType::ID, None)?;
@@ -346,6 +378,8 @@ impl Parser {
 
     //Parse the parameters of a function declaration
     fn paramsdecl(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING PARAMSDECL");
+
         //If the current token is a closing brackets ')',
         //then there are no parameters and we return early
         if self.current_token.value == ")" {
@@ -367,16 +401,21 @@ impl Parser {
 
     //Parse a function call
     fn func(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING FUNC");
+
         self.consume(TokenType::ID, None)?;
         self.consume(TokenType::SYMBOL, Some("("))?;
         self.params()?;
         self.consume(TokenType::SYMBOL, Some(")"))?;
+        self.endexpr()?;
 
         Ok(())
     }
 
     //Parse the parameters of a function call
     fn params(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING PARAMS");
+
         //If the current token is a closing brackets ')',
         //then there are no parameters and we return early
         if self.current_token.value == ")" {
@@ -397,6 +436,8 @@ impl Parser {
 
     //Parse an assignment
     fn asgn(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING ASGN");
+
         self.consume(TokenType::ID, None)?;
 
         //Match the current token value to check the operator
@@ -416,6 +457,8 @@ impl Parser {
     //Parse a TYPE expression
     //It can be a regular type or an ARRAY
     fn jvtype(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING JVTYPE");
+
         self.consume(TokenType::TYPE, None)?;
 
         if self.current_token.value == "[" {
@@ -428,6 +471,8 @@ impl Parser {
     //Parse an array declaration
     //[ NUM ]
     fn array_decl(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING ARRAY_DECL");
+
         self.consume(TokenType::SYMBOL, Some("["))?;
         self.consume(TokenType::NUMBER, None)?;
         self.consume(TokenType::SYMBOL, Some("]"))?;
@@ -437,6 +482,8 @@ impl Parser {
 
     //Parse the end of an expression, which is a ;
     fn endexpr(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING ENDEXPR");
+
         self.consume(TokenType::SYMBOL, Some(";"))?;
 
         Ok(())

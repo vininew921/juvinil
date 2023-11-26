@@ -4,4 +4,6 @@
     int ghi;
     int jkl;
     int mno;
+
+    salve ( x ) ;
 } 
