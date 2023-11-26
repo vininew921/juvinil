@@ -260,9 +260,60 @@ impl Parser {
         Ok(())
     }
 
-    //Parse a boolean expression TODO
+    //Parse a boolean expression
     fn boolexpr(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING BOOLEXPR");
+
+        //A boolexpr will always end up as a join
+        self.join()?;
+
+        //After we consume a join, we check if we have the base case
+        //for the boolexpr, which is a ||
+        //if we do, we consume the comparator and rerun the boolexpr
+        if self.current_token.value == "||" {
+            self.consume(TokenType::COMPARATOR, None)?;
+            self.boolexpr()?;
+        }
+
+        Ok(())
+    }
+
+    fn join(&mut self) -> JuvinilResult<()> {
+        //A join will always end up as an equality
+        self.equality()?;
+
+        //After we consume an equality, we check if we have the base case
+        //for the join, which is a &&
+        //if we do, we consume the comparator and rerun the join
+        if self.current_token.value == "&&" {
+            self.consume(TokenType::COMPARATOR, None)?;
+            self.join()?;
+        }
+
+        Ok(())
+    }
+
+    fn equality(&mut self) -> JuvinilResult<()> {
+        //An equality will always end up as a cmp
+        self.cmp()?;
+
+        //After we consume a cmp, we check if we have the base case
+        //for the equality, which is a == or !=
+        //if we do, we consume the comparator and rerun the equality
+        if self.current_token.value == "==" || self.current_token.value == "!=" {
+            self.consume(TokenType::COMPARATOR, None)?;
+            self.equality()?;
+        }
+
+        Ok(())
+    }
+
+    fn cmp(&mut self) -> JuvinilResult<()> {
+        //The cmp is the easiest,
+        //it's just an expression followed by a comparator followed by another expression
+        self.expr()?;
+        self.consume(TokenType::COMPARATOR, None)?;
+        self.expr()?;
 
         Ok(())
     }
