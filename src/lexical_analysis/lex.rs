@@ -61,7 +61,9 @@ fn pre_process_line(line_content: &str, line_number: usize) -> JuvinilResult<Vec
             continue;
         }
 
-        let special_symbols = &["++", "--", "+=", "-=", "{", "}", "(", ")", "[", "]", ";"];
+        let special_symbols = &[
+            "++", "--", "+=", "-=", "{", "}", "(", ")", "[", "]", ";", ",",
+        ];
 
         let mut has_special_symbol = false;
         for special_symbol in special_symbols {

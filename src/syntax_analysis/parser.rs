@@ -238,8 +238,19 @@ impl Parser {
 
         //If all of the above fail, the remaning condition
         //is to parse a 'return'
-        tracing::info!("what");
+        self.stmt_return()?;
+        Ok(())
+    }
+
+    fn stmt_return(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::KEYWORD, Some("return"))?;
+
+        //return something (expr) if the current token is
+        //not a semicolon
+        if self.current_token.value != ";" {
+            self.expr()?;
+        }
+
         self.endexpr()?;
         Ok(())
     }
@@ -460,7 +471,7 @@ impl Parser {
         tracing::info!("PARSING FUNCDECL");
 
         self.consume(TokenType::KEYWORD, Some("func"))?;
-        self.consume(TokenType::TYPE, None)?;
+        self.jvtype()?;
         self.consume(TokenType::ID, None)?;
         self.consume(TokenType::SYMBOL, Some("("))?;
         self.paramsdecl()?;

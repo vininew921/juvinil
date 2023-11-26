@@ -54,10 +54,13 @@
 | _stmt_ | **do** _block_ **while** **(** _boolexpr_ **)** **;** |
 | _stmt_ | **break** **;** |
 | _stmt_ | **continue** **;** |
+| _stmt_ | _return_ **;** |
 | _stmt_ | _asgn_ |
 | _asgn_ | **ID =** _expr_ **;** |
 | _asgn_ | **ID +=** _expr_ **;** |
 | _asgn_ | **ID -=** _expr_ **;** |
+| _return_ | **return ;** |
+| _return_ | **return** _expr_ **;** |
 
 ### Functions
 | From | To |
