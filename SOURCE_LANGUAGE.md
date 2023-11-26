@@ -1,3 +1,4 @@
+
 ### Source Language
 
 | From | To |
@@ -87,11 +88,14 @@
 | _cmp_ | _expr_ **>=** _expr_ |
 | _expr_ | _expr_ **+** _bnr_ |
 | _expr_ | _expr_ **-** _bnr_ |
+| _expr_ | _bnr_ |
 | _brn_ | _brn_ **&** _term_ |
 | _brn_ | _brn_ **\|** _term_ |
+| _brn_ | _term_ |
 | _term_ | _term_ **\*** _unit_ |
 | _term_ | _term_ **\/** _unit_ |
 | _term_ | _term_ **%** _unit_ |
+| _term_ | _unit_ |
 | _unit_ | **-** unit |
 | _unit_ | **++** unit |
 | _unit_ | **--** unit |
