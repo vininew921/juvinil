@@ -54,7 +54,6 @@
 | _stmt_ | **break** **;** |
 | _stmt_ | **continue** **;** |
 | _stmt_ | _asgn_ |
-| _asgn_ | **ID =** _boolexpr_ **;** |
 | _asgn_ | **ID =** _expr_ **;** |
 | _asgn_ | **ID +=** _expr_ **;** |
 | _asgn_ | **ID -=** _expr_ **;** |
