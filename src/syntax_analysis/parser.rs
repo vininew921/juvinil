@@ -152,6 +152,7 @@ impl Parser {
         let stmt_values = [
             "for", "if", "while", "do", "break", "continue", "return", "{", "func",
         ];
+
         let stmt_types = [TokenType::ID];
 
         while stmt_values.contains(&self.current_token.value.as_str())
@@ -277,6 +278,7 @@ impl Parser {
         self.consume(TokenType::SYMBOL, Some("("))?;
         self.boolexpr()?;
         self.consume(TokenType::SYMBOL, Some(")"))?;
+        self.block()?;
 
         if self.current_token.value == "else" {
             self.consume(TokenType::KEYWORD, Some("else"))?;
@@ -459,6 +461,17 @@ impl Parser {
             return Ok(());
         }
 
+        //If the current token is an ID and the lookahead isn't
+        //a parenthesis, then it's just an ID asgn (x = y)
+        if self.current_token.token_type == TokenType::ID {
+            if let Some(lookahead) = self.lookahead.clone() {
+                if lookahead.value != "(" {
+                    self.consume(TokenType::ID, None)?;
+                    return Ok(());
+                }
+            }
+        }
+
         //If the current token is not a number nor a parenthesis,
         //the only remaining option is for it to be a function
         self.func()?;
@@ -552,8 +565,15 @@ impl Parser {
             _ => self.consume(TokenType::OPERATOR, Some("="))?,
         }
 
-        self.expr()?;
+        //If the value after the operator is a string, consume it
+        if self.current_token.token_type == TokenType::STRING {
+            self.consume(TokenType::STRING, None)?;
+            self.endexpr()?;
+            return Ok(());
+        }
 
+        //Otherwise, consume an expression
+        self.expr()?;
         self.endexpr()?;
 
         Ok(())

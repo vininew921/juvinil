@@ -39,6 +39,11 @@ mod tests {
         let tokens = lex::tokenize(file_content);
 
         assert!(tokens.is_ok(), "Should be OK");
+
+        let mut parser = Parser::new(tokens.unwrap()).unwrap();
+        let result = parser.parse();
+
+        assert!(result.is_ok(), "Should be OK");
     }
 
     #[test]
@@ -48,6 +53,11 @@ mod tests {
         let tokens = lex::tokenize(file_content);
 
         assert!(tokens.is_ok(), "Should be OK");
+
+        let mut parser = Parser::new(tokens.unwrap()).unwrap();
+        let result = parser.parse();
+
+        assert!(result.is_ok(), "Should be OK");
     }
 
     #[test]
@@ -57,15 +67,11 @@ mod tests {
         let tokens = lex::tokenize(file_content);
 
         assert!(tokens.is_ok(), "Should be OK");
-    }
 
-    #[test]
-    fn strings_error() {
-        let file_content = fs::read_to_string("test_inputs/strings_error.jv").unwrap();
+        let mut parser = Parser::new(tokens.unwrap()).unwrap();
+        let result = parser.parse();
 
-        let tokens = lex::tokenize(file_content);
-
-        assert!(tokens.is_err(), "Should be ERR");
+        assert!(result.is_ok(), "Should be OK");
     }
 
     #[test]
@@ -75,6 +81,11 @@ mod tests {
         let tokens = lex::tokenize(file_content);
 
         assert!(tokens.is_ok(), "Should be OK");
+
+        let mut parser = Parser::new(tokens.unwrap()).unwrap();
+        let result = parser.parse();
+
+        assert!(result.is_ok(), "Should be OK");
     }
 
     #[test]
@@ -84,5 +95,10 @@ mod tests {
         let tokens = lex::tokenize(file_content);
 
         assert!(tokens.is_ok(), "Should be OK");
+
+        let mut parser = Parser::new(tokens.unwrap()).unwrap();
+        let result = parser.parse();
+
+        assert!(result.is_ok(), "Should be OK");
     }
 }

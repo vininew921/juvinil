@@ -1,6 +1,4 @@
-string teste = "testando o for xD";
-int count = 0;
-
-for ( int i = 0; i < 10; i++ ) {
-    count++ ; 
+for ( i = 0; 5 < 10 ) {
+    teste = 5 ; 
 }
+

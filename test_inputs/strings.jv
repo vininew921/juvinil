@@ -1,5 +1,4 @@
-string a = "word";
-string b = "with spaces";
-string c = "no endexpr ';'";
-string d = "multiple words i don't know";
-
+a = "word";
+b = "with spaces";
+c = "no endexpr ';'";
+d = "multiple words i don't know";

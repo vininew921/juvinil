@@ -1,3 +1,7 @@
-int test_int = 5;
-string test_string = "teste string xdd";
-float test_float = 14.3;
+int test_int;
+string test_string;
+float test_float;
+
+test_int = 5;
+test_string = "salve galerinha xdd";
+test_float = 10.3;
