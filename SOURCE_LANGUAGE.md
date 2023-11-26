@@ -89,9 +89,9 @@
 | _expr_ | _expr_ **+** _bnr_ |
 | _expr_ | _expr_ **-** _bnr_ |
 | _expr_ | _bnr_ |
-| _brn_ | _brn_ **&** _term_ |
-| _brn_ | _brn_ **\|** _term_ |
-| _brn_ | _term_ |
+| _bnr_ | _bnr_ **&** _term_ |
+| _bnr_ | _bnr_ **\|** _term_ |
+| _bnr_ | _term_ |
 | _term_ | _term_ **\*** _unit_ |
 | _term_ | _term_ **\/** _unit_ |
 | _term_ | _term_ **%** _unit_ |
