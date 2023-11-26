@@ -61,9 +61,7 @@ fn pre_process_line(line_content: &str, line_number: usize) -> JuvinilResult<Vec
             continue;
         }
 
-        let special_symbols = &[
-            "!", "++", "--", "+=", "-=", "{", "}", "(", ")", "[", "]", ";",
-        ];
+        let special_symbols = &["++", "--", "+=", "-=", "{", "}", "(", ")", "[", "]", ";"];
 
         let mut has_special_symbol = false;
         for special_symbol in special_symbols {
@@ -98,6 +96,10 @@ fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {
         return Ok(Token::new_keyword(String::from(*keyword)));
     }
 
+    if let Some(comparator) = token::COMPARATORS.iter().find(|&x| *x == token) {
+        return Ok(Token::new_comparator(String::from(*comparator)));
+    }
+
     if let Some(operator) = token::OPERATORS.iter().find(|&x| *x == token) {
         return Ok(Token::new_operator(String::from(*operator)));
     }
@@ -108,10 +110,6 @@ fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {
 
     if let Some(symbol) = token::SYMBOLS.iter().find(|&x| *x == token) {
         return Ok(Token::new_symbol(String::from(*symbol)));
-    }
-
-    if let Some(comparator) = token::COMPARATORS.iter().find(|&x| *x == token) {
-        return Ok(Token::new_comparator(String::from(*comparator)));
     }
 
     let regex_token = regex_token::REGEX_TOKEN_MAP

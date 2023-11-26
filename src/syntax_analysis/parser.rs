@@ -92,6 +92,11 @@ impl Parser {
 
         self.stmts()?;
 
+        //If we're not at the end of the file, repeat!
+        if self.current_token.token_type != TokenType::EOF {
+            self.program()?;
+        }
+
         Ok(())
     }
 
@@ -100,8 +105,15 @@ impl Parser {
         tracing::info!("PARSING BLOCK");
 
         self.consume(TokenType::SYMBOL, Some("{"))?;
-        self.decls()?;
+
+        //If the current token type is a TYPE, we're
+        //looking at a declaration (decls)
+        if self.current_token.token_type == TokenType::TYPE {
+            self.decls()?;
+        }
+
         self.stmts()?;
+
         self.consume(TokenType::SYMBOL, Some("}"))?;
 
         Ok(())
@@ -137,7 +149,9 @@ impl Parser {
 
         //Parse a statement if the current token is one
         //of the following values or types
-        let stmt_values = ["if", "while", "do", "break", "continue", "{", "func"];
+        let stmt_values = [
+            "for", "if", "while", "do", "break", "continue", "return", "{", "func",
+        ];
         let stmt_types = [TokenType::ID];
 
         while stmt_values.contains(&self.current_token.value.as_str())
@@ -178,6 +192,12 @@ impl Parser {
             return Ok(());
         }
 
+        //Parse a for expression if the current token is a for
+        if self.current_token.value == "for" {
+            self.stmt_for()?;
+            return Ok(());
+        }
+
         //Parse an if expression if the current token is an if
         if self.current_token.value == "if" {
             self.stmt_if()?;
@@ -209,10 +229,32 @@ impl Parser {
             return Ok(());
         }
 
+        //Parse a continue if the current token is 'continue'
+        if self.current_token.value == "continue" {
+            self.consume(TokenType::KEYWORD, Some("continue"))?;
+            self.endexpr()?;
+            return Ok(());
+        }
+
         //If all of the above fail, the remaning condition
-        //is to parse a 'continue'
-        self.consume(TokenType::KEYWORD, Some("continue"))?;
+        //is to parse a 'return'
+        tracing::info!("what");
+        self.consume(TokenType::KEYWORD, Some("return"))?;
         self.endexpr()?;
+        Ok(())
+    }
+
+    //Parse a for expression
+    fn stmt_for(&mut self) -> JuvinilResult<()> {
+        tracing::info!("PARSING STMT_FOR");
+
+        self.consume(TokenType::KEYWORD, Some("for"))?;
+        self.consume(TokenType::SYMBOL, Some("("))?;
+        self.asgn()?;
+        self.boolexpr()?;
+        self.consume(TokenType::SYMBOL, Some(")"))?;
+        self.block()?;
+
         Ok(())
     }
 
@@ -346,7 +388,7 @@ impl Parser {
         //After we consume a term, we check if we have the base case
         //for the bnr, which is a & or |
         //if we do, we consume the operator an rerun the bnr
-        if self.current_token.value == "+" || self.current_token.value == "-" {
+        if self.current_token.value == "&" || self.current_token.value == "|" {
             self.consume(TokenType::OPERATOR, None)?;
             self.bnr()?;
         }

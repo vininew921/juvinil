@@ -1,8 +1,7 @@
 use super::regex_token::RegexToken;
 
-pub const KEYWORDS: [&str; 12] = [
-    "func", "return", "if", "else", "for", "while", "break", "continue", "switch", "case", "true",
-    "false",
+pub const KEYWORDS: [&str; 11] = [
+    "func", "return", "if", "else", "for", "do", "while", "break", "continue", "true", "false",
 ];
 
 pub const OPERATORS: [&str; 13] = [
