@@ -99,7 +99,6 @@
 | _unit_ | **++** unit |
 | _unit_ | **--** unit |
 | _unit_ | _factor_ |
-| _factor_ | **(** _boolexpr_ **)**  |
 | _factor_ | **(** _expr_ **)**  |
 | _factor_ | _num_  |
 | _factor_ | _real_  |
