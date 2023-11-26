@@ -47,7 +47,7 @@
 | _stmt_ | _block_ |
 | _stmt_ | _func_ **;** |
 | _stmt_ | _funcdecl_ |
-| _stmt_ | **for** **(** _decl_ **;** _boolexpr_ **)** _block_ |
+| _stmt_ | **for** **(** _asgn_ **;** _boolexpr_ **)** _block_ |
 | _stmt_ | **if** **(** _boolexpr_ **)** _block_ |
 | _stmt_ | **if** **(** _boolexpr_ **)** _block_ **else** _block_ |
 | _stmt_ | **while** **(** _boolexpr_ **)** _block_ |
