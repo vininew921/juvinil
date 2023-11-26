@@ -5,5 +5,13 @@
     int jkl;
     int mno;
 
+    if ( 5 < 6 && 7 > 8 ) {
+        ghi = teste( x ) ;
+        aoba ( x , y , z ) ; 
+    }
+
+    salve ( x ) ;
+    salve ( x ) ;
+    salve ( x ) ;
     salve ( x ) ;
 } 

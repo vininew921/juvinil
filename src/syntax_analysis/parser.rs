@@ -160,6 +160,7 @@ impl Parser {
                 //It's a function call if the lookahead token is a parenthesis
                 if lookahead.value == "(" {
                     self.func()?;
+                    self.endexpr()?;
 
                     return Ok(());
                 }
@@ -458,7 +459,6 @@ impl Parser {
         self.consume(TokenType::SYMBOL, Some("("))?;
         self.params()?;
         self.consume(TokenType::SYMBOL, Some(")"))?;
-        self.endexpr()?;
 
         Ok(())
     }
@@ -479,6 +479,7 @@ impl Parser {
         //If the current token is a comma (,)
         //We consume a new param
         if self.current_token.value == "," {
+            self.consume(TokenType::SYMBOL, Some(","))?;
             self.params()?;
         }
 
