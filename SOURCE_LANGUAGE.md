@@ -57,6 +57,7 @@
 | _stmt_ | _return_ **;** |
 | _stmt_ | _asgn_ |
 | _asgn_ | **ID =** _expr_ **;** |
+| _asgn_ | **ID =** **STRING** **;** |
 | _asgn_ | **ID +=** _expr_ **;** |
 | _asgn_ | **ID -=** _expr_ **;** |
 | _return_ | **return ;** |
