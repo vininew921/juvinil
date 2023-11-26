@@ -7,6 +7,7 @@ pub struct Parser {
     tokens: Vec<Token>,
     pos: i32,
     current_token: Token,
+    lookahead: Option<Token>,
 }
 
 // General parsing methods (consuming, advancing tokens, etc)
@@ -16,6 +17,7 @@ impl Parser {
             tokens,
             pos: -1,
             current_token: Token::new(TokenType::EOF, String::new()),
+            lookahead: None,
         };
 
         parser.next();
@@ -35,12 +37,14 @@ impl Parser {
         }
 
         let res = self.tokens.get(self.pos as usize);
+        let lookahead = self.tokens.get(self.pos as usize + 1);
 
         if let Some(next) = res {
             tracing::info!("Next: {:?}", next);
         }
 
         self.current_token = res.unwrap().clone();
+        self.lookahead = lookahead.cloned();
 
         res
     }
@@ -238,9 +242,93 @@ impl Parser {
         Ok(())
     }
 
-    //Parse a boolean expression
+    //Parse a boolean expression TODO
     fn boolexpr(&mut self) -> JuvinilResult<()> {
-        self.consume(TokenType::ID, None) //TODO
+        Ok(())
+    }
+
+    //Parse an expression
+    fn expr(&mut self) -> JuvinilResult<()> {
+        //An expr will always end up as a bnr
+        self.bnr()?;
+
+        //After we consume a bnr, we check if we have the base case
+        //for the expr, which is a + or -
+        //if we do, we consume the operator and rerun the expr
+        if self.current_token.value == "+" || self.current_token.value == "-" {
+            self.consume(TokenType::OPERATOR, None)?;
+            self.expr()?;
+        }
+
+        Ok(())
+    }
+
+    fn bnr(&mut self) -> JuvinilResult<()> {
+        //a bnr will always end up in a term
+        self.term()?;
+
+        //After we consume a term, we check if we have the base case
+        //for the bnr, which is a & or |
+        //if we do, we consume the operator an rerun the bnr
+        if self.current_token.value == "+" || self.current_token.value == "-" {
+            self.consume(TokenType::OPERATOR, None)?;
+            self.bnr()?;
+        }
+
+        Ok(())
+    }
+
+    fn term(&mut self) -> JuvinilResult<()> {
+        //a term will always end up in a unit
+        self.unit()?;
+
+        //After we consume a unit, we check if we have the base case
+        //for the term, which is a *, / or %
+        //if we do, we consume the operator an rerun the bnr
+        if self.current_token.value == "*"
+            || self.current_token.value == "/"
+            || self.current_token.value == "%"
+        {
+            self.consume(TokenType::OPERATOR, None)?;
+            self.term()?;
+        }
+
+        Ok(())
+    }
+
+    fn unit(&mut self) -> JuvinilResult<()> {
+        let unit_values = ["-", "++", "--"];
+        if unit_values.contains(&self.current_token.value.as_str()) {
+            self.consume(TokenType::OPERATOR, None)?;
+
+            //Unfortunately, unit is recursive to the right,
+            //so we can't use the same approach as the bnr
+            self.unit()?;
+        }
+
+        self.factor()?;
+
+        Ok(())
+    }
+
+    fn factor(&mut self) -> JuvinilResult<()> {
+        if self.current_token.token_type == TokenType::NUMBER {
+            self.consume(TokenType::NUMBER, None)?;
+            return Ok(());
+        }
+
+        if self.current_token.value == "(" {
+            self.consume(TokenType::SYMBOL, Some("("))?;
+            self.expr()?;
+            self.consume(TokenType::SYMBOL, Some(")"))?;
+            return Ok(());
+        }
+
+        //If the current token is not a number nor a parenthesis,
+        //the only remaining option is for it to be a function
+        self.func()?;
+
+        Ok(())
     }
 
     //Parse a function declaration
@@ -307,6 +395,24 @@ impl Parser {
         Ok(())
     }
 
+    //Parse an assignment
+    fn asgn(&mut self) -> JuvinilResult<()> {
+        self.consume(TokenType::ID, None)?;
+
+        //Match the current token value to check the operator
+        match self.current_token.value.as_str() {
+            "+=" => self.consume(TokenType::OPERATOR, Some("+="))?,
+            "-=" => self.consume(TokenType::OPERATOR, Some("-="))?,
+            _ => self.consume(TokenType::OPERATOR, Some("="))?,
+        }
+
+        self.expr()?;
+
+        self.endexpr()?;
+
+        Ok(())
+    }
+
     //Parse a TYPE expression
     //It can be a regular type or an ARRAY
     fn jvtype(&mut self) -> JuvinilResult<()> {
@@ -325,15 +431,6 @@ impl Parser {
         self.consume(TokenType::SYMBOL, Some("["))?;
         self.consume(TokenType::NUMBER, None)?;
         self.consume(TokenType::SYMBOL, Some("]"))?;
-
-        Ok(())
-    }
-
-    //Parse an assignment
-    //TODO: Consume a boolexpr or expr after the =
-    fn asgn(&mut self) -> JuvinilResult<()> {
-        self.consume(TokenType::ID, None)?;
-        self.consume(TokenType::OPERATOR, Some("="))?;
 
         Ok(())
     }
