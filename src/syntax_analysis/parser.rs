@@ -579,6 +579,7 @@ impl Parser {
         Ok(())
     }
 
+    //A unit is a raw number that can have a modifier (++, --, -)
     fn unit(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING UNIT");
 
@@ -596,6 +597,7 @@ impl Parser {
         Ok(())
     }
 
+    //A factor is basically a raw number or variable
     fn factor(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING FACTOR");
 
