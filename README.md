@@ -1,18 +1,19 @@
 # JUVINIL Programming Language
 
+
+## :clipboard: TO DO
+
+- ~~Factors should also be able to be an ID instead of a raw number or function call~~ ✔️
+- ~~Check if variables have been declared before assigning~~ ✔️
+- ~~Check if functions have been declared before calling~~ ✔️
+- Make function parameters be registered in the function scope
+
 ## :memo: Description
 #### Custom Programming Language Compiler
 
 ## :wrench: Technologies
 #### Rust
 ![](https://www.rust-lang.org/static/images/rust-logo-blk.svg) 
-
-## TO DO
-
-- ~~Factors should also be able to be an ID instead of a raw number or function call~~ ✔️
-- ~~Check if variables have been declared before assigning~~ ✔️
-- ~~Check if functions have been declared before calling~~ ✔️
-- Make function parameters be registered in the function scope
 
 ## :rocket: Run project
 First install Rust at [rustup](https://rustup.rs/) ;
