@@ -1,52 +1,71 @@
+int [ 3 ] a;
+int b;
+int c;
+int d;
+int e;
+int f;
+int k;
+int teste_dois;
+int salve_galera;
+
+if ( a < 6 && b > 8 ) { 
+    f = teste_um( g ) ;
+    aoba ( h , i , j ) ; 
+}
+
+
 {
-    int [ 3 ] a;
-    int b;
-    int c;
-    int d;
-    int e;
-    int f;
-    int k;
-    int teste_dois;
-    int salve_galera;
-
-    if ( a < 6 && b > 8 ) { 
-        f = teste_um( g ) ;
-        aoba ( h , i , j ) ; 
-    }
-
-    a = 5.5 ;
-
-    for ( k = 5; 7 > 8) {
-        do {
-            int x;
-        } while ( 9 < 555) ;
-
-        teste_dois = 3 ;
-
-        teste_tres ( l ) ;
-
-        teste_quatro ( a , b , c , d , e , f , g ) ;
-    }
-
-    func boolean hahahaha ( int xis ) {
-        a = 5;
-        c = 3;
-
-        return 5 + 3 / 10 ;
-    }
-
-    while ( 5 < 3 ) {
-            break ;
-            continue ;
-            return ;
+    {
+        int bloco_test;
+        int bloco_test_b;
+        bloco_test = 5;
+        {
+            bloco_test = 6;
+            {
+                bloco_test = 7;
+                bloco_test_b = 10;
+            }
         }
-        
-    if (5 == 6 && 7 != 10 || 5 < 3 || 10 >= 5 && 10 <= 3 && 5 > 10 & 3
-        || 99 * 3 / 5 > 10 - 3 + 2) {
-            dentro_if ( hehe ) ;
+
+        bloco_test_b = 5;
     }
+}
 
-    salve_galera += 3; 
+for ( k = 5; 7 > 8) {
+    do {
+        int x;
+    } while ( 9 < 555) ;
 
-    ultima_funcao ( x ) ;
-} 
+    teste_dois = 3 ;
+
+    int aoba;
+    char demoro;
+
+    demoro = 3;
+
+    teste_tres ( l ) ;
+
+    teste_quatro ( a , b , c , d , e , f , g ) ;
+}
+
+func boolean hahahaha ( int xis ) {
+    a = 5;
+    c = 3;
+
+    return 5 + 3 / 10 ;
+}
+
+while ( 5 < 3 ) {
+        break ;
+        continue ;
+        return ;
+    }
+    
+if (5 == 6 && 7 != 10 || 5 < 3 || 10 >= 5 && 10 <= 3 && 5 > 10 & 3
+    || 99 * 3 / 5 > 10 - 3 + 2) {
+        dentro_if ( hehe ) ;
+}
+
+salve_galera += 3; 
+
+ultima_funcao ( x ) ;

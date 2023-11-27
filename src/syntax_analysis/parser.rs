@@ -19,7 +19,7 @@ impl Parser {
         let mut parser = Parser {
             tokens,
             pos: -1,
-            current_token: Token::new(TokenType::EOF, String::new()),
+            current_token: Token::new(TokenType::EOF, String::new(), 0),
             lookahead: None,
             current_scope: Some(Scope::new(None)),
         };
@@ -70,6 +70,36 @@ impl Parser {
         }
     }
 
+    fn assert_id_declared(&mut self) -> JuvinilResult<()> {
+        //We collect the variable name
+        //to check if it was already declared.
+        //if it wasn't, we return an error
+        let var_name = self.current_token.value.clone();
+        if !self.search_scope(var_name.clone()) {
+            return Err(JuvinilError::UndeclaredVariable(
+                var_name,
+                self.current_token.file_line,
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn assert_id_not_declared(&mut self) -> JuvinilResult<()> {
+        //We collect the variable name
+        //to check if it was already declared.
+        //if it was, we return an error
+        let var_name = self.current_token.value.clone();
+        if self.search_scope(var_name.clone()) {
+            return Err(JuvinilError::UndeclaredVariable(
+                var_name,
+                self.current_token.file_line,
+            ));
+        }
+
+        Ok(())
+    }
+
     fn next(&mut self) -> Option<&Token> {
         self.pos += 1;
 
@@ -96,6 +126,7 @@ impl Parser {
                 token_type,
                 value.unwrap_or_default().into(),
                 self.current_token.clone(),
+                self.current_token.file_line,
             ));
         }
 
@@ -104,6 +135,7 @@ impl Parser {
                 token_type,
                 value.unwrap_or_default().into(),
                 self.current_token.clone(),
+                self.current_token.file_line,
             ));
         }
 
@@ -149,13 +181,21 @@ impl Parser {
 
         self.consume(TokenType::SYMBOL, Some("{"))?;
 
-        //If the current token type is a TYPE, we're
-        //looking at a declaration (decls)
-        if self.current_token.token_type == TokenType::TYPE {
-            self.decls()?;
-        }
+        //If the current token is an open bracket ({),
+        //we're looking at a block
+        while self.current_token.value != "}" {
+            if self.current_token.value == "{" {
+                self.block()?;
+            }
 
-        self.stmts()?;
+            //If the current token type is a TYPE, we're
+            //looking at a declaration (decls)
+            if self.current_token.token_type == TokenType::TYPE {
+                self.decls()?;
+            }
+
+            self.stmts()?;
+        }
 
         self.consume(TokenType::SYMBOL, Some("}"))?;
 
@@ -184,19 +224,13 @@ impl Parser {
         let var_type = self.current_token.value.clone();
         self.jvtype()?;
 
+        //Assert that the ID we're declaring wasn't
+        //already declared
+        self.assert_id_not_declared()?;
+
         let var_name = self.current_token.value.clone();
         self.consume(TokenType::ID, None)?;
-
         self.endexpr()?;
-
-        //We collect the variable type and name
-        //to check if the current scope already has
-        //a variable with the same name. If it
-        //doesn't, we register it
-        let var_exists = self.search_scope(var_name.clone());
-        if var_exists {
-            return Err(JuvinilError::DuplicateVariable(var_name));
-        }
 
         self.register_variable_in_scope(var_type, var_name);
 
@@ -405,7 +439,6 @@ impl Parser {
             self.consume(TokenType::COMPARATOR, None)?;
             self.join()?;
         }
-
         Ok(())
     }
 
@@ -526,6 +559,8 @@ impl Parser {
         if self.current_token.token_type == TokenType::ID {
             if let Some(lookahead) = self.lookahead.clone() {
                 if lookahead.value != "(" {
+                    self.assert_id_declared()?;
+
                     self.consume(TokenType::ID, None)?;
                     return Ok(());
                 }
@@ -616,13 +651,9 @@ impl Parser {
     fn asgn(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING ASGN");
 
-        //We collect the variable name
-        //to check if it was already declared.
-        //if it wasn't, we return an error
-        let var_name = self.current_token.value.clone();
-        if !self.search_scope(var_name.clone()) {
-            return Err(JuvinilError::UndeclaredVariable(var_name));
-        }
+        //Assert that the current variable
+        //was declared before doing the assignment
+        self.assert_id_declared()?;
 
         self.consume(TokenType::ID, None)?;
 

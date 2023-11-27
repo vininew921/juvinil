@@ -27,7 +27,7 @@ pub fn tokenize(content: String) -> JuvinilResult<Vec<Token>> {
         tokens.extend(token_line);
     }
 
-    tokens.push(Token::eof());
+    tokens.push(Token::eof(content.lines().count()));
 
     Ok(tokens)
 }
@@ -95,23 +95,26 @@ fn pre_process_line(line_content: &str, line_number: usize) -> JuvinilResult<Vec
 
 fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {
     if let Some(keyword) = token::KEYWORDS.iter().find(|&x| *x == token) {
-        return Ok(Token::new_keyword(String::from(*keyword)));
+        return Ok(Token::new_keyword(String::from(*keyword), line_number));
     }
 
     if let Some(operator) = token::OPERATORS.iter().find(|&x| *x == token) {
-        return Ok(Token::new_operator(String::from(*operator)));
+        return Ok(Token::new_operator(String::from(*operator), line_number));
     }
 
     if let Some(jv_type) = token::JV_TYPES.iter().find(|&x| *x == token) {
-        return Ok(Token::new_type(String::from(*jv_type)));
+        return Ok(Token::new_type(String::from(*jv_type), line_number));
     }
 
     if let Some(symbol) = token::SYMBOLS.iter().find(|&x| *x == token) {
-        return Ok(Token::new_symbol(String::from(*symbol)));
+        return Ok(Token::new_symbol(String::from(*symbol), line_number));
     }
 
     if let Some(comparator) = token::COMPARATORS.iter().find(|&x| *x == token) {
-        return Ok(Token::new_comparator(String::from(*comparator)));
+        return Ok(Token::new_comparator(
+            String::from(*comparator),
+            line_number,
+        ));
     }
 
     let regex_token = regex_token::REGEX_TOKEN_MAP
@@ -119,5 +122,5 @@ fn process_token(token: &str, line_number: usize) -> JuvinilResult<Token> {
         .find(|op| Regex::new(op.regex_template).unwrap().is_match(token))
         .ok_or(JuvinilError::LexicalError(String::from(token), line_number))?;
 
-    Ok(Token::from_regex_token(regex_token, token))
+    Ok(Token::from_regex_token(regex_token, token, line_number))
 }

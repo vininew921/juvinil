@@ -31,56 +31,61 @@ pub enum TokenType {
 pub struct Token {
     pub token_type: TokenType,
     pub value: String,
+    pub file_line: usize,
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, value: String) -> Self {
-        Token { token_type, value }
+    pub fn new(token_type: TokenType, value: String, file_line: usize) -> Self {
+        Token {
+            token_type,
+            value,
+            file_line,
+        }
     }
 
-    pub fn new_keyword(value: String) -> Self {
-        Token::new(TokenType::KEYWORD, value)
+    pub fn new_keyword(value: String, file_line: usize) -> Self {
+        Token::new(TokenType::KEYWORD, value, file_line)
     }
 
-    pub fn new_operator(value: String) -> Self {
-        Token::new(TokenType::OPERATOR, value)
+    pub fn new_operator(value: String, file_line: usize) -> Self {
+        Token::new(TokenType::OPERATOR, value, file_line)
     }
 
-    pub fn new_type(value: String) -> Self {
-        Token::new(TokenType::TYPE, value)
+    pub fn new_type(value: String, file_line: usize) -> Self {
+        Token::new(TokenType::TYPE, value, file_line)
     }
 
-    pub fn new_symbol(value: String) -> Self {
-        Token::new(TokenType::SYMBOL, value)
+    pub fn new_symbol(value: String, file_line: usize) -> Self {
+        Token::new(TokenType::SYMBOL, value, file_line)
     }
 
-    pub fn new_comparator(value: String) -> Self {
-        Token::new(TokenType::COMPARATOR, value)
+    pub fn new_comparator(value: String, file_line: usize) -> Self {
+        Token::new(TokenType::COMPARATOR, value, file_line)
     }
 
-    pub fn new_id(value: String) -> Self {
-        Token::new(TokenType::ID, value)
+    pub fn new_id(value: String, file_line: usize) -> Self {
+        Token::new(TokenType::ID, value, file_line)
     }
 
-    pub fn new_string(value: String) -> Self {
-        Token::new(TokenType::STRING, value.replace('"', ""))
+    pub fn new_string(value: String, file_line: usize) -> Self {
+        Token::new(TokenType::STRING, value.replace('"', ""), file_line)
     }
 
-    pub fn new_number(value: String) -> Self {
-        Token::new(TokenType::NUMBER, value)
+    pub fn new_number(value: String, file_line: usize) -> Self {
+        Token::new(TokenType::NUMBER, value, file_line)
     }
 
-    pub fn from_regex_token(rt: &RegexToken, value: &str) -> Self {
+    pub fn from_regex_token(rt: &RegexToken, value: &str, file_line: usize) -> Self {
         match rt.token_type {
-            TokenType::ID => Token::new_id(value.into()),
-            TokenType::STRING => Token::new_string(value.into()),
-            TokenType::NUMBER => Token::new_number(value.into()),
+            TokenType::ID => Token::new_id(value.into(), file_line),
+            TokenType::STRING => Token::new_string(value.into(), file_line),
+            TokenType::NUMBER => Token::new_number(value.into(), file_line),
             _ => panic!("This shouldn't be possible xdd"),
         }
     }
 
-    pub fn eof() -> Self {
-        Token::new(TokenType::EOF, "".into())
+    pub fn eof(file_line: usize) -> Self {
+        Token::new(TokenType::EOF, "".into(), file_line)
     }
 
     pub fn values(&self) -> (TokenType, &str) {
