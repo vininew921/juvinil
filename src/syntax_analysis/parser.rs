@@ -3,7 +3,7 @@ use crate::{
     lexical_analysis::token::{Token, TokenType},
 };
 
-use super::scope::Scope;
+use super::scope::{JvFunction, JvVariable, Scope};
 
 pub struct Parser {
     tokens: Vec<Token>,
@@ -44,7 +44,7 @@ impl Parser {
         self.current_scope = *parent;
     }
 
-    fn search_scope(&mut self, var_name: String) -> bool {
+    fn search_var_in_scope(&mut self, var_name: String) -> bool {
         let mut scope = &self.current_scope;
 
         while let Some(inner_scope) = scope {
@@ -62,11 +62,29 @@ impl Parser {
         false
     }
 
+    fn search_func_in_scope(&mut self, func_name: String) -> bool {
+        let mut scope = &self.current_scope;
+
+        while let Some(inner_scope) = scope {
+            if inner_scope
+                .functions
+                .iter()
+                .any(|x| *x.func_name == func_name)
+            {
+                return true;
+            }
+
+            scope = &inner_scope.parent;
+        }
+
+        false
+    }
+
     fn register_variable_in_scope(&mut self, var_type: String, var_name: String) {
         if let Some(current_scope) = self.current_scope.as_mut() {
             current_scope
                 .variables
-                .push(super::scope::JvVariable { var_type, var_name });
+                .push(JvVariable { var_type, var_name });
         }
     }
 
@@ -75,7 +93,7 @@ impl Parser {
         //to check if it was already declared.
         //if it wasn't, we return an error
         let var_name = self.current_token.value.clone();
-        if !self.search_scope(var_name.clone()) {
+        if !self.search_var_in_scope(var_name.clone()) {
             return Err(JuvinilError::UndeclaredVariable(
                 var_name,
                 self.current_token.file_line,
@@ -90,9 +108,48 @@ impl Parser {
         //to check if it was already declared.
         //if it was, we return an error
         let var_name = self.current_token.value.clone();
-        if self.search_scope(var_name.clone()) {
-            return Err(JuvinilError::UndeclaredVariable(
+        if self.search_var_in_scope(var_name.clone()) {
+            return Err(JuvinilError::DuplicateVariable(
                 var_name,
+                self.current_token.file_line,
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn register_func_in_scope(&mut self, return_type: String, func_name: String) {
+        if let Some(current_scope) = self.current_scope.as_mut() {
+            current_scope.functions.push(JvFunction {
+                return_type,
+                func_name,
+            });
+        }
+    }
+
+    fn assert_func_declared(&mut self) -> JuvinilResult<()> {
+        //We collect the variable name
+        //to check if it was already declared.
+        //if it wasn't, we return an error
+        let func_name = self.current_token.value.clone();
+        if !self.search_func_in_scope(func_name.clone()) {
+            return Err(JuvinilError::UndeclaredFunction(
+                func_name,
+                self.current_token.file_line,
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn assert_func_not_declared(&mut self) -> JuvinilResult<()> {
+        //We collect the variable name
+        //to check if it was already declared.
+        //if it was, we return an error
+        let func_name = self.current_token.value.clone();
+        if self.search_func_in_scope(func_name.clone()) {
+            return Err(JuvinilError::DuplicateFunction(
+                func_name,
                 self.current_token.file_line,
             ));
         }
@@ -579,12 +636,22 @@ impl Parser {
         tracing::info!("PARSING FUNCDECL");
 
         self.consume(TokenType::KEYWORD, Some("func"))?;
+
+        let return_type = self.current_token.value.clone();
         self.jvtype()?;
+
+        //Assert that the function hasn't already
+        //been declared
+        self.assert_func_not_declared()?;
+        let func_name = self.current_token.value.clone();
+
         self.consume(TokenType::ID, None)?;
         self.consume(TokenType::SYMBOL, Some("("))?;
         self.paramsdecl()?;
         self.consume(TokenType::SYMBOL, Some(")"))?;
         self.block()?;
+
+        self.register_func_in_scope(return_type, func_name);
 
         Ok(())
     }
@@ -616,6 +683,10 @@ impl Parser {
     fn func(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING FUNC");
 
+        //Assert that the current function
+        //has already been declared
+        self.assert_func_declared()?;
+
         self.consume(TokenType::ID, None)?;
         self.consume(TokenType::SYMBOL, Some("("))?;
         self.params()?;
@@ -634,8 +705,8 @@ impl Parser {
             return Ok(());
         }
 
-        //Consume an ID
-        self.consume(TokenType::ID, None)?;
+        //Parameters can be any expression
+        self.expr()?;
 
         //If the current token is a comma (,)
         //We consume a new param

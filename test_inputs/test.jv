@@ -8,11 +8,23 @@ int k;
 int teste_dois;
 int salve_galera;
 
-if ( a < 6 && b > 8 ) { 
-    f = teste_um( g ) ;
-    aoba ( h , i , j ) ; 
+func string teste_um (int x) {
+    a = 2;
 }
 
+func string aoba ( ) {
+    salve_galera = "xd";
+}
+
+if ( a < 6 && b > 8 ) { 
+    f = teste_um( 5 ) ;
+
+    int h;
+    int i;
+    int j;
+
+    aoba ( h , i , j ) ; 
+}
 
 {
     {
@@ -31,6 +43,14 @@ if ( a < 6 && b > 8 ) {
     }
 }
 
+func void teste_tres (int param) {
+    a = 5;
+
+    if (k >= 9) {
+        k = 5;
+    }
+}
+
 for ( k = 5; 7 > 8) {
     do {
         int x;
@@ -43,9 +63,9 @@ for ( k = 5; 7 > 8) {
 
     demoro = 3;
 
+    string l;
+    l = "eu to ficando sem criatividade pra nomes";
     teste_tres ( l ) ;
-
-    teste_quatro ( a , b , c , d , e , f , g ) ;
 }
 
 func boolean hahahaha ( int xis ) {
@@ -61,11 +81,14 @@ while ( 5 < 3 ) {
         return ;
     }
     
-if (5 == 6 && 7 != 10 || 5 < 3 || 10 >= 5 && 10 <= 3 && 5 > 10 & 3
-    || 99 * 3 / 5 > 10 - 3 + 2) {
-        dentro_if ( hehe ) ;
+if (5 == 6 && 7 != 10 || 5 < 3 || 10 >= 5 && 10 <= 3 && 5 > 10 & 3 || 99 * 3 / 5 > 10 - 3 + 2) {
+    func boolean dentro_if (boolean teste_if) {
+        a = 3;
+    }
+
+    dentro_if ( a ) ;
 }
+
 
 salve_galera += 3; 
 
-ultima_funcao ( x ) ;
