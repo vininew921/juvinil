@@ -1,3 +1,5 @@
+string a;
+char b;
 if ( a == 5 ) {
     b = 3;
 }

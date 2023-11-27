@@ -8,6 +8,12 @@ pub enum JuvinilError {
     #[error("Syntax error - Expecting <{0:?} {1}>, found {2:?}")]
     SyntaxError(TokenType, String, Token),
 
+    #[error("Duplicate Variable - Variable {0} was already declared in the current scope")]
+    DuplicateVariable(String),
+
+    #[error("Undeclared Variable - Variable {0} was not declared in the current scope")]
+    UndeclaredVariable(String),
+
     #[error("Parsing error")]
     ParsingError,
 

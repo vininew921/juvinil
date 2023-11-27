@@ -1,4 +1,6 @@
+int i;
 for ( i = 0; 5 < 10 ) {
-    teste = 5 ; 
+    int teste;
+    teste = 5; 
 }
 

@@ -3,11 +3,14 @@ use crate::{
     lexical_analysis::token::{Token, TokenType},
 };
 
+use super::scope::Scope;
+
 pub struct Parser {
     tokens: Vec<Token>,
     pos: i32,
     current_token: Token,
     lookahead: Option<Token>,
+    current_scope: Option<Scope>,
 }
 
 // General parsing methods (consuming, advancing tokens, etc)
@@ -18,6 +21,7 @@ impl Parser {
             pos: -1,
             current_token: Token::new(TokenType::EOF, String::new()),
             lookahead: None,
+            current_scope: Some(Scope::new(None)),
         };
 
         parser.next();
@@ -27,6 +31,43 @@ impl Parser {
 
     pub fn parse(&mut self) -> JuvinilResult<()> {
         self.program()
+    }
+
+    fn push_scope(&mut self) {
+        let parent = self.current_scope.take();
+        self.current_scope = Some(Scope::new(parent));
+    }
+
+    fn pop_scope(&mut self) {
+        let last_scope = self.current_scope.take();
+        let parent = last_scope.unwrap().parent;
+        self.current_scope = *parent;
+    }
+
+    fn search_scope(&mut self, var_name: String) -> bool {
+        let mut scope = &self.current_scope;
+
+        while let Some(inner_scope) = scope {
+            if inner_scope
+                .variables
+                .iter()
+                .any(|x| *x.var_name == var_name)
+            {
+                return true;
+            }
+
+            scope = &inner_scope.parent;
+        }
+
+        false
+    }
+
+    fn register_variable_in_scope(&mut self, var_type: String, var_name: String) {
+        if let Some(current_scope) = self.current_scope.as_mut() {
+            current_scope
+                .variables
+                .push(super::scope::JvVariable { var_type, var_name });
+        }
     }
 
     fn next(&mut self) -> Option<&Token> {
@@ -102,6 +143,8 @@ impl Parser {
 
     //block -> { decls stmts }
     fn block(&mut self) -> JuvinilResult<()> {
+        self.push_scope();
+
         tracing::info!("PARSING BLOCK");
 
         self.consume(TokenType::SYMBOL, Some("{"))?;
@@ -115,6 +158,8 @@ impl Parser {
         self.stmts()?;
 
         self.consume(TokenType::SYMBOL, Some("}"))?;
+
+        self.pop_scope();
 
         Ok(())
     }
@@ -136,9 +181,24 @@ impl Parser {
     fn decl(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING DECL");
 
+        let var_type = self.current_token.value.clone();
         self.jvtype()?;
+
+        let var_name = self.current_token.value.clone();
         self.consume(TokenType::ID, None)?;
+
         self.endexpr()?;
+
+        //We collect the variable type and name
+        //to check if the current scope already has
+        //a variable with the same name. If it
+        //doesn't, we register it
+        let var_exists = self.search_scope(var_name.clone());
+        if var_exists {
+            return Err(JuvinilError::DuplicateVariable(var_name));
+        }
+
+        self.register_variable_in_scope(var_type, var_name);
 
         Ok(())
     }
@@ -555,6 +615,14 @@ impl Parser {
     //Parse an assignment
     fn asgn(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING ASGN");
+
+        //We collect the variable name
+        //to check if it was already declared.
+        //if it wasn't, we return an error
+        let var_name = self.current_token.value.clone();
+        if !self.search_scope(var_name.clone()) {
+            return Err(JuvinilError::UndeclaredVariable(var_name));
+        }
 
         self.consume(TokenType::ID, None)?;
 

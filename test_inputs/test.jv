@@ -4,8 +4,12 @@
     int c;
     int d;
     int e;
+    int f;
+    int k;
+    int teste_dois;
+    int salve_galera;
 
-    if ( 5 < 6 && 7 > 8 ) {
+    if ( a < 6 && b > 8 ) { 
         f = teste_um( g ) ;
         aoba ( h , i , j ) ; 
     }
@@ -14,7 +18,7 @@
 
     for ( k = 5; 7 > 8) {
         do {
-
+            int x;
         } while ( 9 < 555) ;
 
         teste_dois = 3 ;
@@ -32,10 +36,6 @@
     }
 
     while ( 5 < 3 ) {
-            int a;
-            int b;
-            int c;
-
             break ;
             continue ;
             return ;
