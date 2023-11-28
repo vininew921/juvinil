@@ -1,3 +1,5 @@
+use std::fs;
+
 use crate::{
     error::{JuvinilError, JuvinilResult},
     lexical_analysis::token::{Token, TokenType},
@@ -6,15 +8,18 @@ use crate::{
 use super::scope::{JvFunction, JvVariable, Scope};
 
 pub struct Parser {
-    tokens: Vec<Token>,
-    pos: i32,
-    current_token: Token,
-    lookahead: Option<Token>,
-    current_scope: Option<Scope>,
+    tokens: Vec<Token>,           //List of tokens created by the lexical analyzer
+    pos: i32,                     //Current position in the token list
+    current_token: Token,         //Reference to the current token (tokens[pos])
+    lookahead: Option<Token>,     //Reference to the lookahead (tokens[pos + 1])
+    current_scope: Option<Scope>, //Current active scope
+    intermediary_code: String,    //Intermediary code generated during the parse routine
 }
 
 // General parsing methods (consuming, advancing tokens, etc)
 impl Parser {
+    //Instantiates a new `Parser` object, initializing all variables
+    //with their default values
     pub fn new(tokens: Vec<Token>) -> JuvinilResult<Self> {
         let mut parser = Parser {
             tokens,
@@ -22,28 +27,66 @@ impl Parser {
             current_token: Token::new(TokenType::EOF, String::new(), 0),
             lookahead: None,
             current_scope: Some(Scope::new(None)),
+            intermediary_code: String::from("#include <stdio.h>\n\n"),
         };
 
+        //We call the `next()` function
+        //to set the current token to be the first token
+        //of the lexical analisys output.
         parser.next();
 
         Ok(parser)
     }
 
-    pub fn parse(&mut self) -> JuvinilResult<()> {
-        self.program()
+    //Dumps the intermediary code generated during the
+    //parse routine to the specified file
+    pub fn dump_intermediary_code(&self, filepath: &str) -> JuvinilResult<()> {
+        fs::write(filepath, self.intermediary_code.clone())?;
+        Ok(())
     }
 
+    //Initiates the parsing routine, starting with the `program`
+    pub fn parse(&mut self) -> JuvinilResult<()> {
+        self.intermediary_code.push_str("int main() {\n");
+        self.program()?;
+        self.intermediary_code.push_str("}\n");
+
+        Ok(())
+    }
+
+    //Maps a JvType to a C type
+    fn map_type(&self, value: &str) -> String {
+        match value {
+            "void" => "void".into(),
+            "int" => "int".into(),
+            "float" => "float".into(),
+            "boolean" => "bool".into(),
+            "char" => "char".into(),
+            "string" => "string".into(),
+            _ => panic!("Wtf"),
+        }
+    }
+
+    //Create a new scope and set the current scope as the
+    //parent of the new scope. Then, make the
+    //new scope the current scope
     fn push_scope(&mut self) {
         let parent = self.current_scope.take();
         self.current_scope = Some(Scope::new(parent));
     }
 
+    //Take the current scope and throw it away,
+    //making the scope's parent the new current scope
     fn pop_scope(&mut self) {
         let last_scope = self.current_scope.take();
         let parent = last_scope.unwrap().parent;
         self.current_scope = *parent;
     }
 
+    //Search for a variable inside the current scope
+    //If the variable wasn't found, we search recursively
+    //through the scope's parent until we find it or the
+    //parent is null
     fn search_var_in_scope(&mut self, var_name: String) -> bool {
         let mut scope = &self.current_scope;
 
@@ -62,6 +105,10 @@ impl Parser {
         false
     }
 
+    //Search for a function inside the current scope
+    //If the function wasn't found, we search recursively
+    //through the scope's parent until we find it or the
+    //parent is null
     fn search_func_in_scope(&mut self, func_name: String) -> bool {
         let mut scope = &self.current_scope;
 
@@ -80,6 +127,7 @@ impl Parser {
         false
     }
 
+    //Register a variable in the current scope
     fn register_variable_in_scope(&mut self, var_type: String, var_name: String) {
         if let Some(current_scope) = self.current_scope.as_mut() {
             current_scope
@@ -88,10 +136,10 @@ impl Parser {
         }
     }
 
+    //We collect the variable name
+    //to check if it was already declared.
+    //if it wasn't, we return an error
     fn assert_id_declared(&mut self) -> JuvinilResult<()> {
-        //We collect the variable name
-        //to check if it was already declared.
-        //if it wasn't, we return an error
         let var_name = self.current_token.value.clone();
         if !self.search_var_in_scope(var_name.clone()) {
             return Err(JuvinilError::UndeclaredVariable(
@@ -103,10 +151,10 @@ impl Parser {
         Ok(())
     }
 
+    //We collect the variable name
+    //to check if it was already declared.
+    //if it was, we return an error
     fn assert_id_not_declared(&mut self) -> JuvinilResult<()> {
-        //We collect the variable name
-        //to check if it was already declared.
-        //if it was, we return an error
         let var_name = self.current_token.value.clone();
         if self.search_var_in_scope(var_name.clone()) {
             return Err(JuvinilError::DuplicateVariable(
@@ -118,6 +166,7 @@ impl Parser {
         Ok(())
     }
 
+    //Register a function in the current scope
     fn register_func_in_scope(&mut self, return_type: String, func_name: String) {
         if let Some(current_scope) = self.current_scope.as_mut() {
             current_scope.functions.push(JvFunction {
@@ -127,10 +176,10 @@ impl Parser {
         }
     }
 
+    //We collect the variable name
+    //to check if it was already declared.
+    //if it wasn't, we return an error
     fn assert_func_declared(&mut self) -> JuvinilResult<()> {
-        //We collect the variable name
-        //to check if it was already declared.
-        //if it wasn't, we return an error
         let func_name = self.current_token.value.clone();
         if !self.search_func_in_scope(func_name.clone()) {
             return Err(JuvinilError::UndeclaredFunction(
@@ -142,10 +191,10 @@ impl Parser {
         Ok(())
     }
 
+    //We collect the variable name
+    //to check if it was already declared.
+    //if it was, we return an error
     fn assert_func_not_declared(&mut self) -> JuvinilResult<()> {
-        //We collect the variable name
-        //to check if it was already declared.
-        //if it was, we return an error
         let func_name = self.current_token.value.clone();
         if self.search_func_in_scope(func_name.clone()) {
             return Err(JuvinilError::DuplicateFunction(
@@ -157,6 +206,9 @@ impl Parser {
         Ok(())
     }
 
+    //Iterate over the list of tokens.
+    //We make the token at position `self.pos` the current token,
+    //and the token at `self.pos + 1` the lookahead token
     fn next(&mut self) -> Option<&Token> {
         self.pos += 1;
 
@@ -177,6 +229,11 @@ impl Parser {
         res
     }
 
+    //Consume a token. If the token is of a different type or value
+    //than the provided values, we throw a Syntax Error.
+    //We only check for the token `value` property if an actual value
+    //was provided. This means that we ignore the `value` check if
+    //a None value is given
     fn consume(&mut self, token_type: TokenType, value: Option<&str>) -> JuvinilResult<()> {
         if self.current_token.token_type != token_type {
             return Err(JuvinilError::SyntaxError(
@@ -237,6 +294,7 @@ impl Parser {
         tracing::info!("PARSING BLOCK");
 
         self.consume(TokenType::SYMBOL, Some("{"))?;
+        self.intermediary_code.push_str("{\n");
 
         //If the current token is an open bracket ({),
         //we're looking at a block
@@ -255,6 +313,7 @@ impl Parser {
         }
 
         self.consume(TokenType::SYMBOL, Some("}"))?;
+        self.intermediary_code.push_str("}\n\n");
 
         self.pop_scope();
 
@@ -288,6 +347,9 @@ impl Parser {
         let var_name = self.current_token.value.clone();
         self.consume(TokenType::ID, None)?;
         self.endexpr()?;
+
+        self.intermediary_code
+            .push_str(format!("{} {} ;\n", self.map_type(var_type.as_str()), var_name).as_str());
 
         self.register_variable_in_scope(var_type, var_name);
 
@@ -525,45 +587,62 @@ impl Parser {
     }
 
     //Parse an expression
-    fn expr(&mut self) -> JuvinilResult<()> {
+    fn expr(&mut self) -> JuvinilResult<String> {
         tracing::info!("PARSING EXPR");
 
+        let mut expr_result = String::new();
+
         //An expr will always end up as a bnr
-        self.bnr()?;
+        let bnr_result = self.bnr()?;
+        expr_result.push_str(bnr_result.as_str());
 
         //After we consume a bnr, we check if we have the base case
         //for the expr, which is a + or -
         //if we do, we consume the operator and rerun the expr
         if self.current_token.value == "+" || self.current_token.value == "-" {
+            let operator = self.current_token.value.clone();
             self.consume(TokenType::OPERATOR, None)?;
-            self.expr()?;
+            expr_result.push_str(operator.as_str());
+
+            let recursive_result = self.expr()?;
+            expr_result.push_str(recursive_result.as_str());
         }
 
-        Ok(())
+        Ok(expr_result)
     }
 
-    fn bnr(&mut self) -> JuvinilResult<()> {
+    fn bnr(&mut self) -> JuvinilResult<String> {
         tracing::info!("PARSING BNR");
 
+        let mut bnr_result = String::new();
+
         //a bnr will always end up in a term
-        self.term()?;
+        let term_result = self.term()?;
+        bnr_result.push_str(term_result.as_str());
 
         //After we consume a term, we check if we have the base case
         //for the bnr, which is a & or |
         //if we do, we consume the operator an rerun the bnr
         if self.current_token.value == "&" || self.current_token.value == "|" {
+            let operator = self.current_token.value.clone();
             self.consume(TokenType::OPERATOR, None)?;
-            self.bnr()?;
+            bnr_result.push_str(operator.as_str());
+
+            let recursive_result = self.bnr()?;
+            bnr_result.push_str(recursive_result.as_str());
         }
 
-        Ok(())
+        Ok(bnr_result)
     }
 
-    fn term(&mut self) -> JuvinilResult<()> {
+    fn term(&mut self) -> JuvinilResult<String> {
         tracing::info!("PARSING TERM");
 
+        let mut term_result = String::new();
+
         //a term will always end up in a unit
-        self.unit()?;
+        let unit_result = self.unit()?;
+        term_result.push_str(unit_result.as_str());
 
         //After we consume a unit, we check if we have the base case
         //for the term, which is a *, / or %
@@ -572,45 +651,58 @@ impl Parser {
             || self.current_token.value == "/"
             || self.current_token.value == "%"
         {
+            let operator = self.current_token.value.clone();
             self.consume(TokenType::OPERATOR, None)?;
-            self.term()?;
+            term_result.push_str(operator.as_str());
+
+            let recursive_result = self.term()?;
+            term_result.push_str(recursive_result.as_str());
         }
 
-        Ok(())
+        Ok(term_result)
     }
 
     //A unit is a raw number that can have a modifier (++, --, -)
-    fn unit(&mut self) -> JuvinilResult<()> {
+    fn unit(&mut self) -> JuvinilResult<String> {
         tracing::info!("PARSING UNIT");
+
+        let mut unit_result = String::new();
 
         let unit_values = ["-", "++", "--"];
         if unit_values.contains(&self.current_token.value.as_str()) {
+            let operator = self.current_token.value.clone();
             self.consume(TokenType::OPERATOR, None)?;
+            unit_result.push_str(operator.as_str());
 
             //Unfortunately, unit is recursive to the right,
             //so we can't use the same approach as the bnr
-            self.unit()?;
+            let recursive_result = self.unit()?;
+            unit_result.push_str(recursive_result.as_str());
         }
 
-        self.factor()?;
+        let factor_result = self.factor()?;
+        unit_result.push_str(factor_result.as_str());
 
-        Ok(())
+        Ok(unit_result)
     }
 
     //A factor is basically a raw number or variable
-    fn factor(&mut self) -> JuvinilResult<()> {
+    fn factor(&mut self) -> JuvinilResult<String> {
         tracing::info!("PARSING FACTOR");
 
         if self.current_token.token_type == TokenType::NUMBER {
+            let number = self.current_token.value.clone();
             self.consume(TokenType::NUMBER, None)?;
-            return Ok(());
+
+            return Ok(format!("{}", number));
         }
 
         if self.current_token.value == "(" {
             self.consume(TokenType::SYMBOL, Some("("))?;
-            self.expr()?;
+            let expr_result = self.expr()?;
             self.consume(TokenType::SYMBOL, Some(")"))?;
-            return Ok(());
+
+            return Ok(format!("({})", expr_result));
         }
 
         //If the current token is an ID and the lookahead isn't
@@ -620,17 +712,19 @@ impl Parser {
                 if lookahead.value != "(" {
                     self.assert_id_declared()?;
 
+                    let var_name = self.current_token.value.clone();
                     self.consume(TokenType::ID, None)?;
-                    return Ok(());
+
+                    return Ok(var_name);
                 }
             }
         }
 
         //If the current token is not a number nor a parenthesis,
         //the only remaining option is for it to be a function
-        self.func()?;
+        let func_result = self.func()?;
 
-        Ok(())
+        Ok(func_result)
     }
 
     //Parse a function declaration
@@ -682,42 +776,48 @@ impl Parser {
     }
 
     //Parse a function call
-    fn func(&mut self) -> JuvinilResult<()> {
+    fn func(&mut self) -> JuvinilResult<String> {
         tracing::info!("PARSING FUNC");
 
         //Assert that the current function
         //has already been declared
         self.assert_func_declared()?;
 
+        let func_name = self.current_token.value.clone();
         self.consume(TokenType::ID, None)?;
         self.consume(TokenType::SYMBOL, Some("("))?;
-        self.params()?;
+        let func_params = self.params()?;
         self.consume(TokenType::SYMBOL, Some(")"))?;
 
-        Ok(())
+        Ok(format!("{} ( {} );", func_name, func_params))
     }
 
     //Parse the parameters of a function call
-    fn params(&mut self) -> JuvinilResult<()> {
+    fn params(&mut self) -> JuvinilResult<String> {
         tracing::info!("PARSING PARAMS");
+
+        let mut params_result = String::new();
 
         //If the current token is a closing brackets ')',
         //then there are no parameters and we return early
         if self.current_token.value == ")" {
-            return Ok(());
+            return Ok(String::new());
         }
 
         //Parameters can be any expression
-        self.expr()?;
+        let expr_result = self.expr()?;
+        params_result.push_str(expr_result.as_str());
 
         //If the current token is a comma (,)
         //We consume a new param
         if self.current_token.value == "," {
             self.consume(TokenType::SYMBOL, Some(","))?;
-            self.params()?;
+            params_result.push_str(", ");
+            let recursive_result = self.params()?;
+            params_result.push_str(recursive_result.as_str());
         }
 
-        Ok(())
+        Ok(params_result)
     }
 
     //Parse an assignment

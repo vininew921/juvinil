@@ -3,31 +3,47 @@ use std::fs;
 use juvinil::{error::JuvinilResult, lexical_analysis::lex, syntax_analysis::parser::Parser};
 
 fn main() {
+    //Initializes logging
     tracing_subscriber::fmt().pretty().init();
 
+    //Call the `run` function, returing an
+    //reporting an error in case one occurs
     if let Err(err) = run("test_inputs/test.jv") {
         tracing::error!("{}", err);
         std::process::exit(1);
     }
 }
 
+//Run all steps of the compiler
 fn run(file_path: &str) -> JuvinilResult<()> {
+    //Start by reading the given file into a String
     tracing::info!("--------READING INPUT--------");
     let file = fs::read_to_string(file_path)?;
     tracing::info!("Successfully read contents of file {}", file_path);
 
+    //Take the current file and tokenize it (lex.rs)
     tracing::info!("--------LEXICAL ANALYSIS--------");
     let tokens = lex::tokenize(file)?;
     tracing::info!("Successfully tokenized file contents");
 
+    //Take the resulting tokens and parse them,
+    //which verifies the code syntax and also
+    //builds the intermediary code
     tracing::info!("--------SYNTAX ANALYSIS--------");
     let mut parser = Parser::new(tokens)?;
     parser.parse()?;
     tracing::info!("Successfully parsed file contents");
 
+    //Take the intermediary code from the parser
+    //and dump it into a `.c` file
+    tracing::info!("--------SYNTAX ANALYSIS--------");
+    parser.dump_intermediary_code("result.c")?;
+    tracing::info!("Successfully dumped intermediary code");
+
     Ok(())
 }
 
+//Just some random tests
 #[cfg(test)]
 mod tests {
     use super::*;

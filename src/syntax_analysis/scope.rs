@@ -8,6 +8,8 @@ pub struct JvFunction {
     pub func_name: String,
 }
 
+//A scope contains a reference to it's parent (also a scope),
+//a list of variables and a list of functions
 pub struct Scope {
     pub parent: Box<Option<Scope>>,
     pub variables: Vec<JvVariable>,

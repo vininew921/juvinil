@@ -12,19 +12,25 @@ func string teste_um (int x) {
     a = 2;
 }
 
+int [ 5 ] vec;
+vec = teste_um ( ) ;
+
 func string aoba ( ) {
     salve_galera = "xd";
 }
 
+int h;
+
 if ( a < 6 && b > 8 ) { 
     f = teste_um( 5 ) ;
 
-    int h;
     int i;
     int j;
 
     aoba ( h , i , j ) ; 
 }
+
+h = 5;
 
 {
     {

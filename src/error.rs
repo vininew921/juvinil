@@ -1,5 +1,7 @@
 use crate::lexical_analysis::token::{Token, TokenType};
 
+//Implementation of all the different errors that can
+//occur during all steps of the compiler
 #[derive(Debug, thiserror::Error)]
 pub enum JuvinilError {
     #[error("Couldn't match token {0} to any defined expression - line {1}")]
