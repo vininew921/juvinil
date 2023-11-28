@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, process::Command};
 
 use juvinil::{error::JuvinilResult, lexical_analysis::lex, syntax_analysis::parser::Parser};
 
@@ -36,9 +36,15 @@ fn run(file_path: &str) -> JuvinilResult<()> {
 
     //Take the intermediary code from the parser
     //and dump it into a `.c` file
-    tracing::info!("--------SYNTAX ANALYSIS--------");
-    parser.dump_intermediary_code("result.c")?;
+    tracing::info!("--------DUMPING INTERMEDIARY CODE--------");
+    parser.dump_intermediary_code("compiler_results/result.c")?;
     tracing::info!("Successfully dumped intermediary code");
+
+    //Temporary: open notepad with the intermediary code output
+    Command::new("notepad.exe")
+        .arg("compiler_results/result.c")
+        .spawn()
+        .unwrap();
 
     Ok(())
 }

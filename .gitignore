@@ -1,5 +1,6 @@
 /target
 
-# Ignore the `result.c` file, which
-# is the intermediary code output
-result.c
+# Ignore the contents of the compiler results folder, 
+# which is the intermediary code output
+compiler_results/**/*
+!compiler_results/.gitkeep

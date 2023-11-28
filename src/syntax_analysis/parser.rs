@@ -288,6 +288,7 @@ impl Parser {
     }
 
     //block -> { decls stmts }
+    //Intermediary code OK
     fn block(&mut self) -> JuvinilResult<()> {
         self.push_scope();
 
@@ -321,6 +322,7 @@ impl Parser {
     }
 
     //decls -> decls decl
+    //Intermediary code OK
     fn decls(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING DECLS");
 
@@ -334,6 +336,7 @@ impl Parser {
     }
 
     //decl -> TYPE ID endexpr
+    //Intermediary code OK
     fn decl(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING DECL");
 
@@ -349,7 +352,7 @@ impl Parser {
         self.endexpr()?;
 
         self.intermediary_code
-            .push_str(format!("{} {} ;\n", self.map_type(var_type.as_str()), var_name).as_str());
+            .push_str(format!("{} {};\n", self.map_type(var_type.as_str()), var_name).as_str());
 
         self.register_variable_in_scope(var_type, var_name);
 
@@ -357,6 +360,7 @@ impl Parser {
     }
 
     //stmts -> stmts stmt
+    //Intermediary code OK
     fn stmts(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING STMTS");
 
@@ -378,6 +382,7 @@ impl Parser {
     }
 
     //Statement can be pretty much everything that is not a declaration
+    //Intermediary code TODO
     fn stmt(&mut self) -> JuvinilResult<()> {
         tracing::info!("PARSING STMT");
 
@@ -776,6 +781,7 @@ impl Parser {
     }
 
     //Parse a function call
+    //Intermediary code OK
     fn func(&mut self) -> JuvinilResult<String> {
         tracing::info!("PARSING FUNC");
 
