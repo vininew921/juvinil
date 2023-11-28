@@ -1,37 +1,63 @@
-int [ 3 ] a;
+func void teste_tres (string param) {
+    printf ( "%s\n" , param ) ;
+}
+
+func string teste_um (int x) {
+    x = 2;
+    return "teste_um deu bom!" ;
+}
+
+func string aoba ( int h, int i ) {
+    printf ( "%d\n" , h + i ) ;
+    return "aoba deu bom!" ;
+}
+
+func boolean hahahaha ( int xis ) {
+    xis += 5;
+    xis = xis * 3;
+
+    if ( xis < 10 ) {
+        return true ;
+    }
+
+    return false ;
+}
+
 int b;
 int c;
 int d;
 int e;
-int f;
+string f;
 int k;
 int teste_dois;
 int salve_galera;
 
-func string teste_um (int x) {
-    a = 2;
-}
-
-int [ 5 ] vec;
-vec = teste_um ( ) ;
-
-func string aoba ( ) {
-    salve_galera = "xd";
-}
-
 int h;
 
-if ( a < 6 && b > 8 ) { 
+d = 3;
+b = 9;
+
+if ( d < 6 && b > 8 ) { 
     f = teste_um( 5 ) ;
 
     int i;
-    int j;
 
-    aoba ( h , i , j ) ; 
+    h = 7;
+    i = 10;
+
+    aoba ( h , i ) ; 
+}
+
+int x;
+x = 0;
+while (x < 10) {
+    printf ( "%d\n" , x ) ;
+    x = x + 1;
 }
 
 h = 5;
 
+printf ( "%d\n" , h ) ;
 {
     {
         int bloco_test;
@@ -49,17 +75,10 @@ h = 5;
     }
 }
 
-func void teste_tres (int param) {
-    a = 5;
-
-    if (k >= 9) {
-        k = 5;
-    }
-}
 
 for ( k = 5; 7 > 8) {
     do {
-        int x;
+        int y;
     } while ( 9 < 555) ;
 
     teste_dois = 3 ;
@@ -70,31 +89,11 @@ for ( k = 5; 7 > 8) {
     demoro = 3;
 
     string l;
-    l = "eu to ficando sem criatividade pra nomes";
+    l = "eu to ficando sem criatividade pra nomes" ;
     teste_tres ( l ) ;
 }
 
-func boolean hahahaha ( int xis ) {
-    a = 5;
-    c = 3;
 
-    return 5 + 3 / 10 ;
-}
+printf ( "%s" , "fim xD" ) ;
 
-while ( 5 < 3 ) {
-        break ;
-        continue ;
-        return ;
-    }
-    
-if (5 == 6 && 7 != 10 || 5 < 3 || 10 >= 5 && 10 <= 3 && 5 > 10 & 3 || 99 * 3 / 5 > 10 - 3 + 2) {
-    func boolean dentro_if (boolean teste_if) {
-        a = 3;
-    }
-
-    dentro_if ( a ) ;
-}
-
-
-salve_galera += 3; 
-
+salve_galera += 3;

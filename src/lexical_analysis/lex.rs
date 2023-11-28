@@ -66,10 +66,9 @@ fn pre_process_line(line_content: &str, line_number: usize) -> JuvinilResult<Vec
         //If inside a string, we append the `complete_string` variable until we find a <";>
         if inside_string {
             complete_string.push_str(word);
-            if word.ends_with(&['\"', ';'][..]) {
+            if word.ends_with(&['\"'][..]) {
                 inside_string = false;
-                processed_content.push(complete_string[0..complete_string.len() - 1].to_string());
-                processed_content.push(";".into());
+                processed_content.push(complete_string[0..complete_string.len()].to_string());
                 complete_string.clear();
             } else {
                 complete_string.push(' ');

@@ -1,8 +1,11 @@
 
+
 ### Source Language
 
 | From | To |
 | -- | -- |
+| _start_ | _funcdecl_ _start_ |
+| _start_ | _program_ |
 | _program_ | _decls_|
 | _program_ | _block_ |
 | _program_ | _stmts_ |
@@ -20,7 +23,6 @@
 
 | From | To |
 | -- | -- |
-| _type_ | _type_ **\[** _num_ **]** |
 | _type_ | _basic_ |
 | _basic_ | **void** |
 | _basic_ | **int** |
@@ -46,7 +48,6 @@
 | _stmt_ | _asgn_ |
 | _stmt_ | _block_ |
 | _stmt_ | _func_ **;** |
-| _stmt_ | _funcdecl_ |
 | _stmt_ | **for** **(** _asgn_ _boolexpr_ **)** _block_ |
 | _stmt_ | **if** **(** _boolexpr_ **)** _block_ |
 | _stmt_ | **if** **(** _boolexpr_ **)** _block_ **else** _block_ |
@@ -67,8 +68,10 @@
 | From | To |
 | -- | -- |
 | _func_ |  **ID (** _params_ **)** |
-| _params_ |  **ID,** _params_|
-| _params_ |  **ID** |
+| _params_ |  **STRING** _params_|
+| _params_ |  _expr_ _params_|
+| _params_ |  **STRING** |
+| _params_ |  _expr_ |
 | _params_ | **ε** |
 | _funcdecl_ | **func** _type_ **ID (** _paramsdecl_ **)** _block_ |
 | _paramsdecl_ | _type_ **ID** **,** _paramsdecl_|
@@ -109,4 +112,5 @@
 | _factor_ | _real_  |
 | _factor_ | _func_  |
 | _factor_ | _ID_  |
+
 

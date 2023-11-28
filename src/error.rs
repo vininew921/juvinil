@@ -16,6 +16,9 @@ pub enum JuvinilError {
     #[error("Undeclared Variable - Variable `{0}` was not declared - line {1}")]
     UndeclaredVariable(String, usize),
 
+    #[error("Unassigned Variable - Variable `{0}` was not assigned before being used - line {1}")]
+    UnassignedVariable(String, usize),
+
     #[error("Duplicate Function - Function `{0}` was already declared - line {1}")]
     DuplicateFunction(String, usize),
 
