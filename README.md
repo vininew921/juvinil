@@ -6,7 +6,9 @@
 - ~~Factors should also be able to be an ID instead of a raw number or function call~~ ✔️
 - ~~Check if variables have been declared before assigning~~ ✔️
 - ~~Check if functions have been declared before calling~~ ✔️
-- Make function parameters be registered in the function scope
+- ~~Make function parameters be registered in the function scope~~ ✔️
+- ~~Intermediary code generation to C++, compilation and execution~~ ✔️
+- Type check variables and parameters 
 
 ## :memo: Description
 #### Custom Programming Language Compiler

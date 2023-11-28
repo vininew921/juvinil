@@ -9,6 +9,7 @@ func string teste_um (int x) {
 
 func string aoba ( int h, int i ) {
     printf ( "%d\n" , h + i ) ;
+    printf ( "%s\n" , "aoba deu bom!!!" ) ;
     return "aoba deu bom!" ;
 }
 
@@ -84,16 +85,12 @@ for ( k = 5; 7 > 8) {
     teste_dois = 3 ;
 
     int aoba;
-    char demoro;
-
-    demoro = 3;
 
     string l;
     l = "eu to ficando sem criatividade pra nomes" ;
     teste_tres ( l ) ;
 }
 
-
-printf ( "%s" , "fim xD" ) ;
+printf ( "fim do programa!" ) ;
 
 salve_galera += 3;

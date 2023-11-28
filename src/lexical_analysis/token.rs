@@ -8,7 +8,7 @@ pub const OPERATORS: [&str; 13] = [
     "=", "+", "-", "*", "/", "%", "!", "&", "|", "++", "--", "+=", "-=",
 ];
 
-pub const JV_TYPES: [&str; 6] = ["void", "int", "float", "boolean", "char", "string"];
+pub const JV_TYPES: [&str; 4] = ["void", "int", "boolean", "string"];
 
 pub const SYMBOLS: [&str; 8] = [";", "(", ")", "[", "]", "{", "}", ","];
 

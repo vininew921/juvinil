@@ -1,4 +1,4 @@
-use std::{env, fs, process::Command};
+use std::{fs, process::Command};
 
 use juvinil::{error::JuvinilResult, lexical_analysis::lex, syntax_analysis::parser::Parser};
 
@@ -50,7 +50,9 @@ fn run(file_path: &str) -> JuvinilResult<()> {
         .unwrap();
 
     //Run the generated .exe
-    Command::new("compiler_results/result.exe").spawn().unwrap();
+    Command::new("compiler_results/result.exe")
+        .status()
+        .unwrap();
 
     Ok(())
 }

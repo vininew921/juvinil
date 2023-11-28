@@ -37,8 +37,6 @@
 | -- | -- |
 | _num_ | **NUM** _num_ |
 | _num_ | **NUM** **ε** |
-| _real_ | _num_ **.** _num_ |
-| _real_ | _num_ |
 
 ### Statements
 
@@ -109,7 +107,6 @@
 | _unit_ | _factor_ |
 | _factor_ | **(** _expr_ **)**  |
 | _factor_ | _num_  |
-| _factor_ | _real_  |
 | _factor_ | _func_  |
 | _factor_ | _ID_  |
 
