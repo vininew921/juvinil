@@ -13,17 +13,32 @@
 ## :memo: Description
 #### Custom Programming Language Compiler
 
-## :wrench: Technologies
-#### Rust
-![](https://www.rust-lang.org/static/images/rust-logo-blk.svg) 
+## 🔧 Dependencies
+You need Rust and g++ to run the project.
 
-## :rocket: Run project
-First install Rust at [rustup](https://rustup.rs/) ;
+Install Rust at [rustup](https://rustup.rs/)
+
+Install g++ at [MinGW](https://www.mingw-w64.org/)
+
+Make sure that Rust is correctly installed by running
+```
+rustc --version
+```
+
+Make sure that g++ is correctly installed by running
+```
+g++ --version
+```
+
+## 🚀 Running
 
 Once installed, clone this repository, open it in a terminal, and execute the following command:
 ```
 cargo run
 ```
+
+This will compile and run the code located in the `test_inputs/test.jv` file
+
 
 ## :books: Features:
 * <b>Lexical Analyzer</b>: Breaks down the source code of a programming language into a sequence of tokens for further processing by the compiler. 
@@ -31,4 +46,4 @@ The lexical analyzer scans the source code word by word and groups them into tok
 **[Token Types](https://github.com/vininew921/juvinil/blob/main/SOURCE_LANGUAGE.md):** Tokens represent meaningful units in the source code, such as keywords (if, else, while), identifiers (variable names), literals (numeric or string constants), and symbols (operators, punctuation).<br>
 The lexical analyzer produces a stream of tokens, which is then passed to the next stage of the compiler or interpreter for further analysis and processing.
 
-* <b>Syntax Analyzer</b>: A syntax analyzer, also known as a parser, is a component of a compiler or interpreter. Its main task is to analyze the sequence of tokens produced by the lexical analyzer and determine whether it conforms to the grammatical rules of the programming language. In other words, it checks whether the arrangement of tokens follows the syntax specified by the language [grammar](https://github.com/vininew921/juvinil/blob/main/SOURCE_LANGUAGE.md):.
+* <b>Syntax Analyzer</b>: A syntax analyzer, also known as a parser, is a component of a compiler or interpreter. Its main task is to analyze the sequence of tokens produced by the lexical analyzer and determine whether it conforms to the grammatical rules of the programming language. In other words, it checks whether the arrangement of tokens follows the syntax specified by the language [grammar](https://github.com/vininew921/juvinil/blob/main/SOURCE_LANGUAGE.md)
