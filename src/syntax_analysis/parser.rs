@@ -51,18 +51,7 @@ impl Parser {
 
     //Initiates the parsing routine, starting with the `program`
     pub fn parse(&mut self) -> JuvinilResult<()> {
-        //Parse all function declarations
-        //before the main program
-        while self.current_token.value == "func" {
-            self.funcdecl()?;
-        }
-
-        self.push_intermediary_code("int main() {\n");
-
-        self.program()?;
-
-        self.push_intermediary_code("\n\ngetch();\n");
-        self.push_intermediary_code("}\n");
+        self.start()?;
         Ok(())
     }
 
@@ -315,6 +304,26 @@ impl Parser {
 
 // Implementation of each of the source language parsing blocks
 impl Parser {
+    //Start is the first parse instruction
+    //First it parses all function declarations,
+    //then parses the rest of the program
+    fn start(&mut self) -> JuvinilResult<()> {
+        //Parse all function declarations
+        //before the main program
+        while self.current_token.value == "func" {
+            self.funcdecl()?;
+        }
+
+        self.push_intermediary_code("int main() {\n");
+
+        self.program()?;
+
+        self.push_intermediary_code("\n\ngetch();\n");
+        self.push_intermediary_code("}\n");
+
+        Ok(())
+    }
+
     //Program is the first parse instruction of the whole file
     fn program(&mut self) -> JuvinilResult<()> {
         //If the current token is an open bracket ({),
