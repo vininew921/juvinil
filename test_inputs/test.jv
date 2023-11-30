@@ -49,6 +49,7 @@ if ( d < 6 && b > 8 ) {
     aoba ( h , i ) ; 
 }
 
+
 boolean a;
 a = true ;
 

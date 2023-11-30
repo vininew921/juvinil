@@ -939,6 +939,7 @@ impl Parser {
                         .unwrap_or_default()
                         .to_string()
                 })
+                .filter(|s| !s.is_empty())
                 .collect();
 
             if func.params.len() != params_vec.len() {
@@ -994,12 +995,11 @@ impl Parser {
     fn asgn(&mut self) -> JuvinilResult<()> {
         //Assert that the current variable
         //was declared before doing the assignment
-        self.assert_id_declared(true)?;
+        let id_ref = self.assert_id_declared(true)?.unwrap();
 
-        let id_value = self.current_token.value.clone();
         self.consume(TokenType::ID, None)?;
 
-        self.mark_variable_as_assigned(id_value.clone())?;
+        self.mark_variable_as_assigned(id_ref.var_name.clone())?;
 
         //Match the current token value to check the operator
         let operator_value = self.current_token.value.clone();
@@ -1012,6 +1012,15 @@ impl Parser {
         //If the value after the operator is a string, consume it
         let expr_value: String;
         if self.current_token.token_type == TokenType::STRING {
+            if id_ref.var_type != "string" {
+                return Err(JuvinilError::InvalidValueType(
+                    id_ref.var_name.clone(),
+                    id_ref.var_type.clone(),
+                    "string".into(),
+                    self.current_token.file_line,
+                ));
+            }
+
             expr_value = format!("\"{}\"", self.current_token.value.clone());
             self.consume(TokenType::STRING, None)?;
         } else {
@@ -1021,8 +1030,15 @@ impl Parser {
 
         self.endexpr()?;
 
-        self.intermediary_code
-            .push_str(format!("{} {} {};", id_value, operator_value, expr_value).as_str());
+        self.intermediary_code.push_str(
+            format!(
+                "{} {} {};",
+                id_ref.var_name.clone(),
+                operator_value,
+                expr_value
+            )
+            .as_str(),
+        );
 
         Ok(())
     }

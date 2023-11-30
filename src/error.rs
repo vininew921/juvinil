@@ -28,6 +28,9 @@ pub enum JuvinilError {
     #[error("Invalid Parameter Count - Function `{0}` expects {1} parameters, but {2} were given - line {3}")]
     InvalidParamCount(String, usize, usize, usize),
 
+    #[error("Invalid Value Type - Variable `{0}` expects a value of type `{1}`, but `{2}` was given - line {3}")]
+    InvalidValueType(String, String, String, usize),
+
     #[error("Unclosed string - line {0}")]
     UnclosedString(usize),
 
