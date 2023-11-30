@@ -867,6 +867,7 @@ impl Parser {
                     .unwrap_or_default()
                     .to_string()
             })
+            .filter(|s| !s.is_empty())
             .collect();
 
         self.register_func_in_scope(return_type, func_name, func_params);
