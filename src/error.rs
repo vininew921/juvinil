@@ -25,7 +25,7 @@ pub enum JuvinilError {
     #[error("Undeclared Function - Function `{0}` was not declared - line {1}")]
     UndeclaredFunction(String, usize),
 
-    #[error("Invalid Param Count - Function `{0}` expects {1} parameters, but only {2} were given - line {3}")]
+    #[error("Invalid Parameter Count - Function `{0}` expects {1} parameters, but {2} were given - line {3}")]
     InvalidParamCount(String, usize, usize, usize),
 
     #[error("Unclosed string - line {0}")]
