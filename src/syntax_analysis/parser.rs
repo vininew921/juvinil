@@ -64,9 +64,7 @@ impl Parser {
         match value {
             "void" => "void".into(),
             "int" => "int".into(),
-            "float" => "float".into(),
             "boolean" => "bool".into(),
-            "char" => "char".into(),
             "string" => "string".into(),
             _ => panic!("Wtf"),
         }
@@ -826,7 +824,7 @@ impl Parser {
     fn funcdecl(&mut self) -> JuvinilResult<()> {
         self.consume(TokenType::KEYWORD, Some("func"))?;
 
-        let return_type = self.map_type(self.current_token.value.clone().as_str());
+        let return_type = self.current_token.value.clone();
         self.jvtype()?;
 
         //Assert that the function hasn't already
@@ -844,8 +842,15 @@ impl Parser {
         let params_value = self.paramsdecl()?;
         self.consume(TokenType::SYMBOL, Some(")"))?;
 
-        self.intermediary_code
-            .push_str(format!("{} {} ({})", return_type, func_name, params_value).as_str());
+        self.intermediary_code.push_str(
+            format!(
+                "{} {} ({})",
+                self.map_type(return_type.as_str()),
+                func_name,
+                params_value
+            )
+            .as_str(),
+        );
 
         self.block()?;
 
