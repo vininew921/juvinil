@@ -28,7 +28,6 @@
 | _basic_ | **int** |
 | _basic_ | **float** |
 | _basic_ | **boolean** |
-| _basic_ | **char** |
 | _basic_ | **string** |
 
 ### Numbers
