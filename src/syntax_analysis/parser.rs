@@ -917,14 +917,39 @@ impl Parser {
         //Assert that the current function
         //has already been declared, unless it's the printf function
         let func_name = self.current_token.value.clone();
+        let mut func_ref: Option<JvFunction> = None;
         if func_name != "printf" {
-            self.assert_func_declared(true)?;
+            func_ref = self.assert_func_declared(true)?;
         }
 
         self.consume(TokenType::ID, None)?;
         self.consume(TokenType::SYMBOL, Some("("))?;
         let func_params = self.params()?;
         self.consume(TokenType::SYMBOL, Some(")"))?;
+
+        //Assert that param count is the required number of parameters
+        if let Some(func) = func_ref {
+            //Extract params from `params_value` string
+            let params_vec: Vec<String> = func_params
+                .split(',')
+                .map(|s| {
+                    s.trim()
+                        .split_whitespace()
+                        .next()
+                        .unwrap_or_default()
+                        .to_string()
+                })
+                .collect();
+
+            if func.params.len() != params_vec.len() {
+                return Err(JuvinilError::InvalidParamCount(
+                    func_name,
+                    func.params.len(),
+                    params_vec.len(),
+                    self.current_token.file_line,
+                ));
+            }
+        }
 
         Ok(format!("{} ({})", func_name, func_params))
     }

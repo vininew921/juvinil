@@ -8,6 +8,7 @@
 - ~~Check if functions have been declared before calling~~ ✔️
 - ~~Make function parameters be registered in the function scope~~ ✔️
 - ~~Intermediary code generation to C++, compilation and execution~~ ✔️
+- ~~Check parameter cound when calling function~~ ✔️
 - Type check variables and parameters 
 
 ## :memo: Description
