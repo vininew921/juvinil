@@ -26,7 +26,6 @@
 | _type_ | _basic_ |
 | _basic_ | **void** |
 | _basic_ | **int** |
-| _basic_ | **float** |
 | _basic_ | **boolean** |
 | _basic_ | **string** |
 
